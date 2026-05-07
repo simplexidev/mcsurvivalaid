@@ -1,186 +1,378 @@
-# Survival Aid Implementation Checklist (Bedrock Beta)
+# Survival Aid — Definitive Code-Complete Checklist (Bedrock Edition)
 
-Legend: [x] done, [~] partial, [ ] not started
+> This file is the **source of truth** for implementation completion.
+> Scope: **code complete** only (not playtested/polished/balanced unless noted).
 
-## 1) Pack and manifest foundation
-- [x] BP manifest exists and parses.
-- [x] RP manifest exists and parses.
-- [x] BP depends on RP header UUID.
-- [x] Script entry point configured (`behavior/scripts/main.js`).
-- [x] Script modules declared in BP dependencies.
-- [~] Script module versions validated against your exact target client build in-world.
-- [x] Placeholder UUID token removed.
-- [x] Min engine version set in both manifests.
-- [~] Final pre-release UUID rotation pass (recommended just before ship).
+Legend:
+- [x] Implemented in codebase
+- [~] Partially implemented (usable, but missing parts)
+- [ ] Not implemented
 
-## 2) Binary-free placeholder asset workflow
-- [x] Placeholder marker files for chest textures and book icon.
-- [x] Placeholder marker files for pack icons.
-- [x] CI checks for placeholder marker presence.
-- [ ] Swap placeholders with real PNG assets before packaging.
+---
 
-## 3) Core custom content registration
-- [x] Custom block behavior file for `simplexidev:survival_chest`.
-- [x] Custom item behavior file for `simplexidev:book_of_survival`.
-- [x] Resource atlases map intended texture identifiers.
-- [~] In-game render verification of block/item textures (pending real PNGs).
+## A. Project identity and invariants
+- [x] Add-on identity uses name “Survival Aid”.
+- [x] Creator/author identified as “SimplexiDev” in docs/manifests.
+- [x] Namespace `simplexidev` used for custom content.
+- [x] Custom block id fixed to `simplexidev:survival_chest`.
+- [x] Custom item id fixed to `simplexidev:book_of_survival`.
+- [x] Java Edition concepts intentionally avoided in implementation.
 
-## 4) First-spawn setup flow
-- [x] One-time initial prompt shown on first spawn.
-- [x] Disable choice persisted per player.
-- [x] Enable flow opens class selection.
-- [x] Selected class persisted and class-track initialized.
-- [x] Starter items issued.
-- [x] Starter issuance idempotent (no duplicate grant if already owned).
-- [~] Retry UX when class-selection is canceled (currently returns silently).
+## B. Pack structure and manifests
+### B1. Behavior/Resource manifests
+- [x] Behavior manifest exists and parses.
+- [x] Resource manifest exists and parses.
+- [x] Behavior header UUID present and non-placeholder.
+- [x] Resource header UUID present and non-placeholder.
+- [x] Behavior module UUID(s) present and non-placeholder.
+- [x] Resource module UUID(s) present and non-placeholder.
+- [x] Behavior depends on Resource by RP header UUID.
+- [x] Behavior declares script module entry `scripts/main.js`.
+- [x] Behavior includes `@minecraft/server` dependency.
+- [x] Behavior includes `@minecraft/server-ui` dependency.
+- [x] Min engine versions set in both packs.
+- [~] Exact module version compatibility confirmed on target Bedrock runtime build.
 
-## 5) Survival Chest behavior
-- [x] One chest per player (enforced by state).
-- [x] Interaction claims rewards.
-- [x] Ownership/location check for claiming.
-- [x] Duplicate placement rollback/refund best effort.
-- [x] Destroy event clears registered chest location.
-- [x] Reward-ready permutation switching.
-- [x] Periodic visual sync tick.
-- [~] Robust anti-abuse checks for race conditions in multiplayer edge cases.
+### B2. Manifest maintenance
+- [x] Placeholder dependency token removed (`REPLACE_WITH_*`).
+- [x] Version arrays present in headers/modules/dependencies where required.
+- [ ] Final “release-time” UUID refresh pass (optional before public release).
 
-## 6) Book of Survival main menu
-- [x] Structure Locator button.
-- [x] Item Requests button.
-- [x] Teleport to Respawn button.
-- [x] Teleport to Last Death button.
-- [x] In-game Documentation button.
-- [x] Add-On Settings button.
+## C. Resource placeholders and binary-free workflow
+- [x] Binary-free placeholder policy documented.
+- [x] Placeholder text markers for Survival Chest normal texture.
+- [x] Placeholder text markers for Survival Chest ready texture.
+- [x] Placeholder text markers for Book of Survival icon.
+- [x] Placeholder marker for behavior pack icon.
+- [x] Placeholder marker for resource pack icon.
+- [ ] Real PNG replacements created and committed for release packaging.
 
-## 7) HUD and status
-- [x] HUD action bar update loop.
+## D. Block/item content definitions
+### D1. Survival Chest block content
+- [x] Block definition file exists under behavior pack.
+- [x] Custom component wiring exists (`simplexidev:survival_chest_component`).
+- [x] Reward-ready state/permutation exists (`simplexidev:has_reward`).
+- [x] Material/texture references for normal and ready states exist.
+- [~] Final visual behavior validated in-world with real textures.
+
+### D2. Book of Survival item content
+- [x] Item definition file exists under behavior pack.
+- [x] Max stack size set to 1.
+- [x] Custom component wiring exists (`simplexidev:book_of_survival_component`).
+- [x] Icon key reference exists.
+
+## E. Script bootstrap and service loop
+- [x] Script entrypoint imports all core services.
+- [x] World initialize registers custom block component.
+- [x] World initialize registers custom item component.
+- [x] World initialize ensures world state initialization.
+- [x] Initial-spawn event triggers first-spawn flow.
+- [x] Entity-death event triggers death handling.
+- [x] Block quest tracker subscribed.
+- [x] Combat quest tracker subscribed.
+- [x] Tick loop runs reward service.
+- [x] Tick loop runs travel tracker.
+- [x] Tick loop updates HUD.
+- [x] Tick loop syncs chest visual state.
+
+## F. State model and persistence
+### F1. Player state schema
+- [x] `stateVersion` field present.
+- [x] `hasSeenInitialPrompt` present.
+- [x] `enabled` flag present.
+- [x] Class track fields present (`currentClass`, `start`, claims, pending, prompts).
+- [x] Death metadata field present (`lastDeathLocation`).
+- [x] Chest fields present (`placed`, `location`).
+- [x] Request list present.
+- [x] Quest progress buckets present.
+- [x] Claimed/pending quest reward lists present.
+- [x] Settings object present.
+- [x] Cooldowns object present.
+
+### F2. Player state behavior
+- [x] Default player state factory exists.
+- [x] Dynamic-property read wrapper exists.
+- [x] Corrupt JSON fallback handled.
+- [x] Nested merge behavior for schema evolution present.
+- [x] Dynamic-property write wrapper exists.
+- [x] Update-helper wrapper exists.
+
+### F3. World state schema/behavior
+- [x] World state object has `stateVersion`.
+- [x] World state object has `initialized` marker.
+- [x] World state object has `createdAtTick`.
+- [x] World state object has `notes` list.
+- [x] Ensure-initialized helper exists and persists default.
+
+## G. First-spawn onboarding flow
+- [x] Prompt asks enable/disable.
+- [x] Disable path persists `hasSeenInitialPrompt=true` and `enabled=false`.
+- [x] Disable path does not grant starter items.
+- [x] Enable path opens class selection form.
+- [x] Class list includes Adventurer.
+- [x] Class list includes Warrior.
+- [x] Class list includes Miner.
+- [x] Class list includes Mage.
+- [x] Selected class persisted.
+- [x] Class track start initialized at current world day.
+- [x] Last death day initialized at current world day.
+- [x] Starter chest issuance attempted.
+- [x] Starter book issuance attempted.
+- [x] Starter issuance idempotency enforced (no duplicate if already in inventory).
+- [~] Canceled class selection retry UX (currently exits).
+
+## H. Class system and progression
+- [x] Class definitions exist with names/descriptions.
+- [x] Class setter for initial class exists.
+- [x] Class change action exists.
+- [x] Completed class tracking list exists.
+- [x] Next class-change prompt day tracked.
+- [x] Class-change availability prompt exists.
+- [x] “Keep current class” path exists.
+- [x] “Select new class” form exists.
+- [x] Excludes currently active class in switch list.
+- [x] Excludes completed classes in switch list.
+- [x] Prompt de-duping guard prevents overlap.
+- [~] “Completed class” rule aligned exactly to Tier-5 claimed semantics.
+
+## I. Reward schedule and claiming
+### I1. Schedule
+- [x] Class reward schedule table exists.
+- [x] Milestones include day 3.
+- [x] Milestones include day 7.
+- [x] Milestones include day 10.
+- [x] Milestones include day 15.
+- [x] Milestones include day 20.
+- [x] Recurring reward support exists after configured start day.
+- [x] Next reward day computation helper exists.
+- [x] Earned reward-day computation helper exists.
+
+### I2. Reward queueing and claiming
+- [x] Pending class reward queue populated from schedule.
+- [x] Pending quest reward queue claim path exists.
+- [x] Completed item request claim path exists.
+- [x] Claimed class reward-day tracking exists.
+- [x] Claimed quest token tracking exists.
+- [x] “No rewards ready” player message exists.
+- [x] “Claimed rewards” player message exists.
+- [x] Inventory add-then-overflow-drop behavior exists.
+- [x] Partial overflow handling fixed to drop leftover only.
+- [~] Transaction-like atomicity for mixed reward bundles (best effort currently).
+
+## J. Survival Chest runtime behavior
+- [x] One chest per player check.
+- [x] Duplicate placement rejection message.
+- [x] Duplicate placement rollback attempt (set air).
+- [x] Duplicate placement item refund best effort.
+- [x] Chest location persisted with dimension and xyz.
+- [x] Owner id persisted in chest location payload.
+- [x] Interaction validates chest matches stored location.
+- [x] Non-owned/non-registered chest claim blocked.
+- [x] Interacting own chest triggers claim pipeline.
+- [x] Interacting own chest updates texture state.
+- [x] Destroying registered chest clears chest state.
+- [x] Periodic chest visual sync helper exists.
+- [~] Hard anti-cheat ownership (beyond location-owner best effort) not fully guaranteed.
+
+## K. Book of Survival UI
+- [x] Main menu opens from custom item use.
+- [x] Button: Structure Locator.
+- [x] Button: Item Requests.
+- [x] Button: Teleport to Respawn.
+- [x] Button: Teleport to Last Death.
+- [x] Button: In-Game Documentation.
+- [x] Button: Add-On Settings.
+
+## L. HUD behavior
+- [x] HUD can be toggled globally per player.
 - [x] Days survived display toggle.
-- [x] Days-until-reward display toggle.
+- [x] Days until next reward display toggle.
 - [x] Reward-ready display toggle.
-- [x] Reward ready considers class + quest + ready requests.
-- [~] Anti-flicker smoothing/per-player rate limiter (basic 1s loop only).
+- [x] Reward-ready computed from full pending sources.
+- [x] Update cadence ~once per second.
+- [~] Additional anti-flicker debouncing not implemented.
 
-## 8) Class track and class-change lifecycle
-- [x] Class track start day stored.
-- [x] Death resets class-track start and survival counter.
-- [x] Pending rewards preserved across death.
-- [x] Class reward days scheduled and queued.
-- [x] Class-change prompt gating and deferral.
-- [x] Completed class tracking on change.
-- [x] Prompt de-dupe guard (`activePrompts`).
-- [~] Completion rule correctness (currently completion on class switch; may need stricter Tier-5 check).
-- [ ] Prevent class switch if class not truly completed per final design.
+## M. Item request system
+- [x] Curated request item list includes coal.
+- [x] Includes raw_iron.
+- [x] Includes raw_copper.
+- [x] Includes raw_gold.
+- [x] Includes redstone.
+- [x] Includes lapis_lazuli.
+- [x] Includes oak_log/spruce_log/birch_log.
+- [x] Includes cobblestone/sand/gravel/clay_ball.
+- [x] Includes wheat_seeds/sugar_cane.
+- [x] Request quantity input implemented (1..64).
+- [x] Timer formula uses `ceil(qty*1.25)` seconds.
+- [x] Active request list UI exists.
+- [x] Request persistence stored in player state.
+- [x] Ready requests become claimable via chest.
+- [x] Claimed request pruning exists.
+- [x] Active request cap implemented (5).
+- [ ] Request cancellation/edit flow.
 
-## 9) Reward claim pipeline
-- [x] Class rewards claim queue.
-- [x] Quest rewards claim queue.
-- [x] Ready item requests claim queue.
-- [x] Inventory-first then overflow drop.
-- [x] Partial-stack overflow handling fixed.
-- [~] Transactional rollback semantics for mid-claim failures (currently best-effort).
+## N. Quest system
+### N1. Infrastructure
+- [x] Data-driven quest threshold table exists.
+- [x] Quest reward table exists.
+- [x] Generic progress increment helper exists.
+- [x] Anti-duplicate pending/claimed token checks exist.
 
-## 10) Item requests
-- [x] Curated item list implemented.
-- [x] Quantity slider (1..64).
-- [x] Duration formula `ceil(qty * 1.25)` seconds.
-- [x] Active request persistence in player state.
-- [x] Active request listing UI.
-- [x] Completed request cleanup/pruning.
-- [~] Hard cap on simultaneous active requests per player.
-- [ ] Request cancellation flow.
+### N2. Travel metrics
+- [x] Horizontal distance approximation.
+- [x] Swim distance approximation.
+- [x] Jump count approximation.
+- [x] Fall distance approximation.
+- [ ] Boat-specific detection.
+- [ ] Elytra glide detection.
 
-## 11) Quest tracking
-### Travel
-- [x] Horizontal movement approximation.
-- [x] Swim movement approximation.
-- [x] Jump approximation.
-- [x] Fall-distance approximation.
-- [ ] Boat-specific travel metric.
-- [ ] Elytra/glide-specific metric.
+### N3. Block metrics
+- [x] Block break event subscribed.
+- [x] Block place event subscribed.
+- [x] Ground classification.
+- [x] Ore/quartz classification.
+- [x] Fauna classification.
+- [x] Decorative fallback classification.
+- [~] Extended fine-grained vanilla taxonomy coverage.
 
-### Blocks
-- [x] Break tracking grouped by category.
-- [x] Place tracking grouped by category.
-- [x] Ground / ore / fauna / decorative categorization.
-- [~] Category taxonomy tuning against full vanilla block set.
+### N4. Combat metrics
+- [x] Hostile kill counting.
+- [x] Passive kill counting.
+- [x] Damage dealt accumulation.
+- [x] Damage taken accumulation.
+- [ ] Crafted gear metric (if detectable).
+- [ ] Smelted gear metric (if detectable).
+- [ ] Broken gear metric (if detectable).
 
-### Combat
-- [x] Hostile kills.
-- [x] Passive kills.
-- [x] Damage dealt.
-- [x] Damage taken.
-- [ ] Crafted weapon/armor metric (if detectable).
-- [ ] Smelted weapon/armor metric (if detectable).
-- [ ] Broken weapon/armor metric (if detectable).
+## O. Teleport systems
+- [x] Teleport to Respawn implemented.
+- [x] Teleport to Last Death implemented.
+- [x] Last-death dimension stored.
+- [x] Last-death coordinates stored.
+- [x] Last-death day stored.
+- [x] Last-death tick stored.
+- [x] Respawn teleport setting gate.
+- [x] Last-death teleport setting gate.
+- [x] Per-teleport cooldown checks.
+- [x] Cooldown remaining message.
+- [x] Teleport success messaging.
+- [x] Teleport failure messaging.
+- [x] Console warning on teleport exception.
+- [~] True safe-spot resolver (currently Y offset).
 
-### Quest rewards
-- [x] Data-driven thresholds.
-- [x] Pending queueing with anti-duplicate token check.
-- [x] Claimed token persistence.
-- [~] Broader reward table balancing by tier/category.
+## P. Structure locator
+- [x] Structure type list includes village.
+- [x] Includes shipwreck.
+- [x] Includes desert pyramid.
+- [x] Includes jungle pyramid.
+- [x] Includes pillager outpost.
+- [x] Includes stronghold.
+- [x] Includes ancient city.
+- [x] Includes trail ruins.
+- [x] Includes mineshaft.
+- [x] Includes monument.
+- [x] Includes fortress.
+- [x] Includes bastion remnant.
+- [x] Uses `locate structure` command.
+- [x] Parses coordinates from status message when available.
+- [x] Computes approximate direction (8-way compass).
+- [x] Computes approximate distance.
+- [x] Fallback messaging when locate unavailable.
+- [ ] Persisted discovered-structure registry fallback.
 
-## 12) Teleports
-- [x] Respawn teleport action.
-- [x] Last death teleport action.
-- [x] Last death location/dimension/day/tick persistence.
-- [x] Cooldown enforcement per action.
-- [x] Settings toggle gates.
-- [x] Error handling + player-facing messages.
-- [~] Safe-landing logic (currently +Y offset only).
+## Q. Documentation and settings UX
+### Q1. Documentation
+- [x] Multi-topic docs menu exists.
+- [x] Topic: what Survival Aid is.
+- [x] Topic: Survival Chest.
+- [x] Topic: Book of Survival.
+- [x] Topic: classes and rewards.
+- [x] Topic: quests.
+- [x] Topic: item requests.
+- [x] Topic: teleports.
+- [x] Topic: settings.
+- [x] Quest progress snapshot page exists.
 
-## 13) Structure locator
-- [x] UI for target structure types.
-- [x] `locate structure` command integration.
-- [x] Coordinate parsing + direction + distance output.
-- [x] Graceful failure message fallback.
-- [ ] Persistent discovered-structure registry fallback if locate unavailable.
+### Q2. Settings
+- [x] Toggle: HUD enabled.
+- [x] Toggle: show days survived.
+- [x] Toggle: show days until reward.
+- [x] Toggle: show reward availability.
+- [x] Toggle: chest texture changes.
+- [x] Toggle: allow teleport to respawn.
+- [x] Toggle: allow teleport to last death.
+- [x] Slider: teleport cooldown seconds.
+- [x] Action: recover starter items.
 
-## 14) Documentation and settings UX
-- [x] Multi-page documentation menu.
-- [x] Quest snapshot view.
-- [x] Settings toggles for HUD fields.
-- [x] Chest texture toggle.
-- [x] Teleport feature toggles.
-- [x] Teleport cooldown slider.
-- [x] Recover starter items action.
+## R. Multiplayer and ownership safety
+- [x] Per-player dynamic property keying.
+- [x] Per-player class/reward/quest/request state separation.
+- [x] Per-player teleport cooldown separation.
+- [x] Chest location ownership check on interaction.
+- [~] Comprehensive anti-grief controls for all edge cases.
 
-## 15) Persistence and migration
-- [x] Player dynamic-property state wrapper.
-- [x] Player default-state merge for schema evolution.
-- [x] World dynamic-property state wrapper.
-- [x] World initialization on startup.
-- [~] Explicit migration step framework beyond default-merge (`stateVersion` currently informational).
+## S. Validation and repository quality
+- [x] `.editorconfig` present.
+- [x] `.gitignore` present.
+- [x] `LICENSE.md` present.
+- [x] `CHANGELOG.md` present.
+- [x] `CONTRIBUTING.md` present.
+- [x] `SECURITY.md` present.
+- [x] `CODE_OF_CONDUCT.md` present.
+- [x] Bug issue template present.
+- [x] Feature request template present.
+- [x] PR template present.
+- [x] CI validate workflow present.
+- [x] CI validates required file presence.
+- [x] CI parses all JSON files.
+- [x] CI checks placeholder UUID token removal.
 
-## 16) Multiplayer safety
-- [x] Per-player state keys.
-- [x] Per-player cooldowns.
-- [x] Chest ownership/location check.
-- [~] Strong anti-theft guarantee beyond location binding.
+## T. README completeness
+- [x] Bedrock-only warning included.
+- [x] Beta status indicated.
+- [x] Install instructions for development packs.
+- [x] Placeholder/binary-free asset note.
+- [x] Known limitations section.
+- [x] Troubleshooting section.
+- [x] Link to implementation checklist.
+- [ ] Packaging instructions beyond dev-pack copy (optional enhancement).
 
-## 17) Validation, docs, and repo hygiene
-- [x] README baseline install notes.
-- [x] LICENSE + governance docs.
-- [x] Issue templates + PR template.
-- [x] JSON + required-file CI validation workflow.
-- [ ] Add Bedrock runtime smoke-test script/checklist automation.
+## U. Manual test execution checklist (required before release)
+- [ ] Clean-world first-spawn flow (enable).
+- [ ] Clean-world first-spawn flow (disable).
+- [ ] One-time prompt non-repeat behavior.
+- [ ] Starter items idempotency check.
+- [ ] Chest duplicate placement rollback/refund behavior.
+- [ ] Chest claim behavior for each reward source.
+- [ ] Chest ready texture transitions over time.
+- [ ] Item request timer accuracy spot-check.
+- [ ] Active request cap behavior.
+- [ ] Quest progress increments for each implemented metric.
+- [ ] Class reward unlock days 3/7/10/15/20.
+- [ ] Recurring reward unlock behavior.
+- [ ] Class-change prompt schedule and deferral.
+- [ ] Respawn teleport in overworld.
+- [ ] Last-death teleport in overworld.
+- [ ] Last-death teleport in nether/end.
+- [ ] Teleport cooldown messaging and enforcement.
+- [ ] Structure locator each listed structure type.
+- [ ] Multiplayer chest ownership check with 2+ players.
+- [ ] Multiplayer reward isolation checks.
 
-## 18) Manual Bedrock playtest checklist (still required)
-- [ ] First-join flow works on clean profile.
-- [ ] Enable path class selection works for all 4 classes.
-- [ ] Disable path never grants starter items.
-- [ ] Chest placement/claim/duplicate destroy cycle tested.
-- [ ] Reward-ready texture flips correctly in-world.
-- [ ] Item request timer + claim flow tested at multiple quantities.
-- [ ] Teleport cooldown and edge failures tested in all dimensions.
-- [ ] Structure locator tested for each listed structure.
-- [ ] Quest progress increments verified for each implemented metric.
-- [ ] Multiplayer ownership checks tested with 2+ players.
+## V. Remaining code-complete items (to mark PR truly “done”)
+- [ ] Boat travel quest metric.
+- [ ] Glide/elytra travel quest metric.
+- [ ] Crafted gear quest metric (or explicit documented non-support).
+- [ ] Smelted gear quest metric (or explicit documented non-support).
+- [ ] Broken gear quest metric (or explicit documented non-support).
+- [ ] Structure registry fallback when locate command is unavailable.
+- [ ] Class completion rule tightened to final intended semantics.
+- [ ] Optional: robust safe-teleport landing resolver.
 
-## 19) Pre-release gates for your original plan
-- [ ] Replace placeholder assets with real textures/icons.
-- [ ] Finalize reward balance tables and quest thresholds.
-- [ ] Implement remaining quest metrics (boat/glide/crafting-smelting-breaking).
-- [ ] Implement structure fallback registry for worlds where locate is unavailable.
-- [ ] Add final migration strategy and bump `stateVersion` policy docs.
-- [ ] Perform final UUID rotation (optional) and lock release versions.
-- [ ] Full in-game regression pass on target Bedrock version.
+---
+
+## Completion policy
+- This PR is **code complete** when every item in sections **A–T and V** is either:
+  - [x] implemented, or
+  - intentionally left out with explicit “documented non-support” and marked [x] accordingly.
+- Section **U** tracks manual verification and is required before release sign-off but does not block code-complete status.
