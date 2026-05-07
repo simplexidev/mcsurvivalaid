@@ -27,14 +27,17 @@ export function hasPendingRewards(player) {
 
 export function claimPendingRewards(player) {
   const state = getPlayerState(player);
-  if (!state.enabled || !state.classTrack.currentClass) return player.sendMessage("Survival Aid rewards are not enabled.");
+  if (!state.enabled) return player.sendMessage("Survival Aid rewards are not enabled.");
   let claimedSomething = false;
 
-  for (const rewardDay of [...state.classTrack.pendingClassRewardDays]) {
-    for (const reward of getClassRewardsForDay(state.classTrack.currentClass, rewardDay)) giveOrDrop(player, reward.itemId, reward.amount);
-    state.classTrack.claimedClassRewardDays.push(rewardDay); claimedSomething = true;
+  if (state.classTrack.currentClass) {
+    for (const rewardDay of [...state.classTrack.pendingClassRewardDays]) {
+      for (const reward of getClassRewardsForDay(state.classTrack.currentClass, rewardDay)) giveOrDrop(player, reward.itemId, reward.amount);
+      state.classTrack.claimedClassRewardDays.push(rewardDay);
+      claimedSomething = true;
+    }
+    state.classTrack.pendingClassRewardDays = [];
   }
-  state.classTrack.pendingClassRewardDays = [];
 
   for (const quest of [...state.quests.pendingQuestRewards]) {
     for (const reward of quest.rewards) giveOrDrop(player, reward.itemId, reward.amount);
@@ -54,4 +57,14 @@ export function claimPendingRewards(player) {
 
 export function getCurrentWorldDay() { return Math.floor(world.getAbsoluteTime() / 24000); }
 function getClassRewardsForDay(classId, rewardDay) { return CLASS_REWARDS[classId]?.[rewardDay] ?? CLASSLESS_RECURRING_REWARD; }
-function giveOrDrop(player, itemId, amount) { const inv = player.getComponent("minecraft:inventory")?.container; const stack = new ItemStack(itemId, amount); if (inv && !inv.addItem(stack)) return; player.dimension.spawnItem(stack, player.location); }
+function giveOrDrop(player, itemId, amount) {
+  const inv = player.getComponent("minecraft:inventory")?.container;
+  const stack = new ItemStack(itemId, amount);
+  if (inv) {
+    const leftover = inv.addItem(stack);
+    if (!leftover) return;
+    player.dimension.spawnItem(leftover, player.location);
+    return;
+  }
+  player.dimension.spawnItem(stack, player.location);
+}
