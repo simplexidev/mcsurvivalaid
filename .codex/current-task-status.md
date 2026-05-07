@@ -209,7 +209,7 @@ Legend:
 - [x] Ready requests become claimable via chest.
 - [x] Claimed request pruning exists.
 - [x] Active request cap implemented (5).
-- [ ] Request cancellation/edit flow.
+- [x] Request cancellation/edit flow (cancel implemented).
 
 ## N. Quest system
 ### N1. Infrastructure
