@@ -1,0 +1,9 @@
+{
+  "resource_pack_name": "Survival Aid",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "book_of_survival": {
+      "textures": "textures/items/book_of_survival"
+    }
+  }
+}
