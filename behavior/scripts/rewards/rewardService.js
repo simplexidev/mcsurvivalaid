@@ -36,6 +36,7 @@ export function claimPendingRewards(player) {
       const ok = grantRewardBundle(player, getClassRewardsForDay(state.classTrack.currentClass, rewardDay));
       if (ok) {
         state.classTrack.claimedClassRewardDays.push(rewardDay);
+        if (rewardDay >= 20) state.classTrack.tier5ClaimedCurrent = true;
         grantedAny = true;
       } else {
         keepPendingClass.push(rewardDay);

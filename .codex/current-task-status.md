@@ -388,9 +388,9 @@ Legend:
 - [x] Add failure path that preserves cooldown fairness and gives actionable user message.
 
 ### AA. Class progression correctness hardening
-- [ ] Enforce class completion rule through explicit Tier-5 claim marker persisted independently from claimed-day list.
-- [ ] Add migration for existing player states to new explicit completion marker.
-- [ ] Block class switching for classes not meeting completion rule in all prompt flows.
+- [x] Enforce class completion rule through explicit Tier-5 claim marker persisted independently from claimed-day list.
+- [x] Add migration for existing player states to new explicit completion marker (default merge path + runtime initialization).
+- [x] Block class switching for classes not meeting completion rule in all prompt flows.
 - [ ] Add regression checks for death/reset interactions with completion markers.
 
 ### AB. Reward-claim transaction robustness

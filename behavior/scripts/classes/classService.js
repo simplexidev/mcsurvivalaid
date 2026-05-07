@@ -16,13 +16,14 @@ export function setInitialClass(player, classId) {
   state.classTrack.claimedClassRewardDays = [];
   state.classTrack.pendingClassRewardDays = [];
   state.classTrack.nextClassChangePromptDay = worldDay + 20;
+  state.classTrack.tier5ClaimedCurrent = false;
   setPlayerState(player, state);
 }
 
 export function changeClass(player, newClassId) {
   const state = getPlayerState(player);
   const oldClass = state.classTrack.currentClass;
-  const reachedTier5 = state.classTrack.claimedClassRewardDays.includes(20);
+  const reachedTier5 = state.classTrack.tier5ClaimedCurrent === true;
   if (oldClass && reachedTier5 && !state.classTrack.completedClasses.includes(oldClass)) state.classTrack.completedClasses.push(oldClass);
   const worldDay = getCurrentWorldDay();
   state.classTrack.currentClass = newClassId;
@@ -30,6 +31,7 @@ export function changeClass(player, newClassId) {
   state.classTrack.claimedClassRewardDays = [];
   state.classTrack.pendingClassRewardDays = [];
   state.classTrack.nextClassChangePromptDay = worldDay + 10;
+  state.classTrack.tier5ClaimedCurrent = false;
   setPlayerState(player, state);
 }
 
@@ -41,7 +43,8 @@ export async function maybePromptClassChange(player, worldDay) {
   activePrompts.add(player.id);
   const confirm = await new MessageFormData().title("Class Change Available").body("You can change class now. Change class?").button1("Change").button2("Keep Current").show(player);
   if (confirm.canceled || confirm.selection !== 0) {
-    state.classTrack.nextClassChangePromptDay = worldDay + 10; setPlayerState(player, state); activePrompts.delete(player.id); return;
+    state.classTrack.nextClassChangePromptDay = worldDay + 10;
+  state.classTrack.tier5ClaimedCurrent = false; setPlayerState(player, state); activePrompts.delete(player.id); return;
   }
   const available = getClassList().filter(c => c.id !== state.classTrack.currentClass && !state.classTrack.completedClasses.includes(c.id));
   if (available.length === 0) { player.sendMessage("All classes completed or unavailable."); state.classTrack.nextClassChangePromptDay = worldDay + 10; setPlayerState(player,state); activePrompts.delete(player.id); return; }
