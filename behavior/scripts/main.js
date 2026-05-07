@@ -25,6 +25,8 @@ world.afterEvents.playerSpawn.subscribe((event) => {
     }
     );
   }
+  const delay = event.initialSpawn ? 40 : 5;
+  system.runTimeout(() => handleInitialSpawn(event.player), delay);
 });
 
 world.afterEvents.entityDie.subscribe((event) => {
