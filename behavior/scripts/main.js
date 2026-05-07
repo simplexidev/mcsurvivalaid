@@ -10,8 +10,10 @@ import { registerBlockQuestTracking } from "./quests/blockTracker.js";
 import { registerCombatQuestTracking } from "./quests/combatTracker.js";
 import { tickTravelTracking } from "./quests/travelTracker.js";
 import { tickRewardService } from "./rewards/rewardService.js";
+import { ensureWorldStateInitialized } from "./state/worldState.js";
 
 world.beforeEvents.worldInitialize.subscribe((event) => {
+  ensureWorldStateInitialized();
   registerSurvivalChestComponent(event);
   registerBookOfSurvivalComponent(event);
 });
