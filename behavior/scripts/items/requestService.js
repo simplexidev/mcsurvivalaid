@@ -31,6 +31,11 @@ function showActiveRequests(player) {
 
 export function queueItemRequest(player, itemId, quantity) {
   const state = getPlayerState(player);
+  const activeCount = state.requests.active.filter(r => !r.claimed).length;
+  if (activeCount >= 5) {
+    player.sendMessage("You already have too many active requests (max 5).");
+    return;
+  }
   const duration = Math.ceil(quantity * 1.25) * 20;
   state.requests.active.push({ itemId, quantity, requestedAtTick: system.currentTick, readyAtTick: system.currentTick + duration, claimed: false });
   setPlayerState(player, state);

@@ -39,3 +39,7 @@ Beta, feature-complete scaffold with placeholder art assets.
 - Check malformed JSON in manifests/textures.
 - Check Content Log for script exceptions.
 - Verify BP dependency UUID points to RP header UUID.
+
+
+## Implementation checklist
+See `docs/IMPLEMENTATION_CHECKLIST.md` for a full, tracked feature checklist.
