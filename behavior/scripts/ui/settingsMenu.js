@@ -21,14 +21,14 @@ export async function showSettingsMenu(player) {
   }
   const state = getPlayerState(player);
   const form = new ModalFormData().title("Survival Aid Settings")
-    .toggle("Show HUD", state.settings.showHud)
-    .toggle("Show Days Survived", state.settings.showDaysSurvived)
-    .toggle("Show Days Until Reward", state.settings.showDaysUntilReward)
-    .toggle("Show Reward Availability", state.settings.showRewardReady)
-    .toggle("Chest Changes Texture", state.settings.chestChangesTexture)
-    .toggle("Allow Teleport to Respawn", state.settings.allowTeleportToRespawn)
-    .toggle("Allow Teleport to Last Death", state.settings.allowTeleportToDeath)
-    .slider("Teleport Cooldown (sec)", 10, 600, 10, state.settings.teleportCooldownSeconds);
+    .toggle("Show HUD", { defaultValue: state.settings.showHud })
+    .toggle("Show Days Survived", { defaultValue: state.settings.showDaysSurvived })
+    .toggle("Show Days Until Reward", { defaultValue: state.settings.showDaysUntilReward })
+    .toggle("Show Reward Availability", { defaultValue: state.settings.showRewardReady })
+    .toggle("Chest Changes Texture", { defaultValue: state.settings.chestChangesTexture })
+    .toggle("Allow Teleport to Respawn", { defaultValue: state.settings.allowTeleportToRespawn })
+    .toggle("Allow Teleport to Last Death", { defaultValue: state.settings.allowTeleportToDeath })
+    .slider("Teleport Cooldown (sec)", 10, 600, { step: 10, defaultValue: state.settings.teleportCooldownSeconds });
   const result = await form.show(player);
   if (result.canceled || !result.formValues) { logger.trace("settingsMenu", "Gameplay settings canceled", { playerId: player.id }); return; }
   const [showHud,showDaysSurvived,showDaysUntilReward,showRewardReady,chestChangesTexture,allowTeleportToRespawn,allowTeleportToDeath,teleportCooldownSeconds] = result.formValues;

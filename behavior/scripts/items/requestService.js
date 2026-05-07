@@ -17,7 +17,7 @@ export async function showItemRequestsMenu(player) {
   const result = await form.show(player);
   if (result.canceled || result.selection === undefined) { logger.trace("requestService", "Request item selection canceled", { playerId: player.id }); return; }
   const itemId = `minecraft:${REQUESTABLE_ITEMS[result.selection]}`;
-  const qtyForm = new ModalFormData().title("Request Quantity").slider("Quantity", 1, 64, 1, 1);
+  const qtyForm = new ModalFormData().title("Request Quantity").slider("Quantity", 1, 64, { step: 1, defaultValue: 1 });
   const qtyResult = await qtyForm.show(player);
   if (qtyResult.canceled || !qtyResult.formValues) { logger.trace("requestService", "Request quantity canceled", { playerId: player.id }); return; }
   queueItemRequest(player, itemId, Math.floor(qtyResult.formValues[0]));
