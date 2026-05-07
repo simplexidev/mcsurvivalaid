@@ -1,7 +1,8 @@
 import { world } from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
 import { getPlayerState } from "../state/playerState.js";
-import { getCurrentWorldDay } from "../rewards/rewardService.js";
+import { getCurrentWorldDay, hasPendingRewards } from "../rewards/rewardService.js";
+import { getNextClassRewardDay } from "../rewards/rewardSchedule.js";
 import { showSettingsMenu } from "./settingsMenu.js";
 import { showDocumentationMenu } from "./documentationMenu.js";
 import { teleportToRespawn, teleportToLastDeath } from "../teleport/teleportService.js";
@@ -63,7 +64,8 @@ export function updateHudForAllPlayers() {
     const worldDay = getCurrentWorldDay();
     const daysSurvived = Math.max(0, worldDay - state.classTrack.lastDeathDay);
     const classTrackDays = Math.max(0, worldDay - state.classTrack.classTrackStartDay);
-    const rewardReady = state.classTrack.pendingClassRewardDays.length > 0;
+    const nextRewardDay = getNextClassRewardDay(classTrackDays, state.classTrack.claimedClassRewardDays, state.classTrack.pendingClassRewardDays);
+    const rewardReady = hasPendingRewards(player);
 
     const parts = [];
 
@@ -72,7 +74,7 @@ export function updateHudForAllPlayers() {
     }
 
     if (state.settings.showDaysUntilReward) {
-      parts.push(`Class Track Days: ${classTrackDays}`);
+      parts.push(`Days Until Reward: ${Math.max(0, nextRewardDay - classTrackDays)}`);
     }
 
     if (state.settings.showRewardReady) {
