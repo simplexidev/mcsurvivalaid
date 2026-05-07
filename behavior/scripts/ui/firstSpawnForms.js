@@ -78,8 +78,12 @@ export function giveStarterItems(player) {
 
 function ensureOneItem(container, itemId) {
   if (countItem(container, itemId) > 0) { logger.trace("firstSpawn", "Starter item already present", { itemId }); return; }
-  container.addItem(new ItemStack(itemId, 1));
-  logger.trace("firstSpawn", "Starter item granted", { itemId });
+  try {
+    container.addItem(new ItemStack(itemId, 1));
+    logger.trace("firstSpawn", "Starter item granted", { itemId });
+  } catch (error) {
+    logger.error("firstSpawn", "Failed to grant starter item", { itemId, error: String(error) });
+  }
 }
 
 function countItem(container, itemId) {

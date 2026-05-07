@@ -3,10 +3,23 @@ import { world } from "@minecraft/server";
 const LOG_LEVELS = { trace: 10, info: 20, warn: 30, error: 40 };
 const DEFAULT_LEVEL = "info";
 const LOG_PROPERTY = "survivalaid:logLevel";
+let cachedLevel = DEFAULT_LEVEL;
+let hasWarnedEarlyExecution = false;
 
 function getConfiguredLevel() {
-  const raw = world.getDynamicProperty(LOG_PROPERTY);
-  if (typeof raw === "string" && LOG_LEVELS[raw] !== undefined) return raw;
+  try {
+    const raw = world.getDynamicProperty(LOG_PROPERTY);
+    if (typeof raw === "string" && LOG_LEVELS[raw] !== undefined) {
+      cachedLevel = raw;
+      return raw;
+    }
+  } catch (error) {
+    if (!hasWarnedEarlyExecution) {
+      hasWarnedEarlyExecution = true;
+      console.warn(`[Survival Aid][WARN][logger] Dynamic properties unavailable yet; using cached/default log level. | ${safeJson({ error: String(error) })}`);
+    }
+  }
+  if (LOG_LEVELS[cachedLevel] !== undefined) return cachedLevel;
   return DEFAULT_LEVEL;
 }
 
@@ -41,7 +54,12 @@ export const logger = {
   error: (scope, message, context) => emit("error", scope, message, context),
   setLogLevel(level) {
     if (LOG_LEVELS[level] === undefined) return false;
-    world.setDynamicProperty(LOG_PROPERTY, level);
+    cachedLevel = level;
+    try {
+      world.setDynamicProperty(LOG_PROPERTY, level);
+    } catch (error) {
+      emit("warn", "logger", "Failed to persist log level; using cached level only", { level, error: String(error) });
+    }
     return true;
   },
   getLogLevel() {
