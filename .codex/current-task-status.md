@@ -394,10 +394,10 @@ Legend:
 - [ ] Add regression checks for death/reset interactions with completion markers.
 
 ### AB. Reward-claim transaction robustness
-- [ ] Add per-reward grant result capture (inventory add/drop status).
-- [ ] Only mark reward token/day claimed after confirmed grant/drop success.
-- [ ] Add retry-safe handling for partial failures within multi-reward bundles.
-- [ ] Add defensive logging for failed grant/drop operations.
+- [x] Add per-reward grant result capture (inventory add/drop status).
+- [x] Only mark reward token/day claimed after confirmed grant/drop success.
+- [~] Add retry-safe handling for partial failures within multi-reward bundles (bundle-level retry safe; per-item rollback still best-effort).
+- [x] Add defensive logging for failed grant/drop operations.
 
 ### AC. Multiplayer ownership hardening
 - [ ] Add optional chest ownership token persisted separately from location for stronger anti-theft verification.
