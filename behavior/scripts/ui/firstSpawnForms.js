@@ -5,24 +5,36 @@ import { getPlayerState, setPlayerState } from "../state/playerState.js";
 import { getClassList } from "../classes/classDefinitions.js";
 import { setInitialClass } from "../classes/classService.js";
 
+const activeInitialPrompts = new Set();
+
 export async function handleInitialSpawn(player) {
+  if (activeInitialPrompts.has(player.id)) return;
+
   const state = getPlayerState(player);
   if (state.hasSeenInitialPrompt) return;
 
+  activeInitialPrompts.add(player.id);
+
   const enableForm = new MessageFormData().title("Survival Aid").body("Enable Survival Aid rewards and utilities?").button1("Enable").button2("Disable");
   const enableResult = await enableForm.show(player);
-  if (enableResult.canceled) return;
+  if (enableResult.canceled) {
+    activeInitialPrompts.delete(player.id);
+    return;
+  }
 
   if (enableResult.selection !== 0) {
     state.hasSeenInitialPrompt = true;
     state.enabled = false;
     setPlayerState(player, state);
     player.sendMessage("Survival Aid disabled for your player profile.");
+    activeInitialPrompts.delete(player.id);
     return;
   }
 
   await showClassSelection(player);
+  activeInitialPrompts.delete(player.id);
 }
+
 
 async function showClassSelection(player) {
   const classes = getClassList();
