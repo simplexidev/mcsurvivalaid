@@ -1,9 +1,11 @@
 import { world, system } from "@minecraft/server";
 import { STORAGE_KEYS } from "./storageKeys.js";
 
+const WORLD_STATE_VERSION = 2;
+
 export function createDefaultWorldState() {
   return {
-    stateVersion: 1,
+    stateVersion: WORLD_STATE_VERSION,
     initialized: true,
     createdAtTick: system.currentTick,
     notes: [],
@@ -16,7 +18,7 @@ export function getWorldState() {
   if (typeof raw !== "string" || raw.length === 0) return createDefaultWorldState();
   try {
     const parsed = JSON.parse(raw);
-    return { ...createDefaultWorldState(), ...parsed, knownStructures: { ...(parsed.knownStructures ?? {}) } };
+    return migrateWorldState({ ...createDefaultWorldState(), ...parsed, knownStructures: { ...(parsed.knownStructures ?? {}) } });
   } catch {
     return createDefaultWorldState();
   }
@@ -24,7 +26,7 @@ export function getWorldState() {
 
 export function ensureWorldStateInitialized() {
   const current = getWorldState();
-  world.setDynamicProperty(STORAGE_KEYS.worldState, JSON.stringify(current));
+  setWorldState(current);
   return current;
 }
 
@@ -32,11 +34,41 @@ export function setWorldState(state) {
   world.setDynamicProperty(STORAGE_KEYS.worldState, JSON.stringify(state));
 }
 
+function migrateWorldState(state) {
+  let current = { ...state };
+  if (!current.stateVersion || current.stateVersion < 2) {
+    current.knownStructures = normalizeKnownStructures(current.knownStructures ?? {});
+    current.stateVersion = 2;
+    current.notes = [...(current.notes ?? []), "migrated_to_v2_known_structure_normalization"];
+  } else {
+    current.knownStructures = normalizeKnownStructures(current.knownStructures ?? {});
+  }
+  return current;
+}
+
+function normalizeKnownStructures(knownStructures) {
+  const out = {};
+  for (const [type, entries] of Object.entries(knownStructures)) {
+    const seen = new Set();
+    out[type] = (entries ?? [])
+      .filter(Boolean)
+      .map(e => ({ dimension: e.dimension, x: Math.floor(e.x), y: Math.floor(e.y), z: Math.floor(e.z), tick: Number(e.tick ?? 0) }))
+      .filter(e => {
+        const key = `${e.dimension}:${e.x}:${e.y}:${e.z}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      })
+      .slice(-32);
+  }
+  return out;
+}
+
 export function registerKnownStructure(type, dimension, x, y, z) {
   const s = getWorldState();
   if (!s.knownStructures[type]) s.knownStructures[type] = [];
   s.knownStructures[type].push({ dimension, x: Math.floor(x), y: Math.floor(y), z: Math.floor(z), tick: system.currentTick });
-  s.knownStructures[type] = s.knownStructures[type].slice(-32);
+  s.knownStructures = normalizeKnownStructures(s.knownStructures);
   setWorldState(s);
 }
 

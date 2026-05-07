@@ -379,7 +379,7 @@ Legend:
 - [x] Add script API for registering discovered structures by type and dimension.
 - [x] Add locator fallback resolution to nearest known structure when `locate` command unavailable.
 - [x] Add user-facing messaging path for “no known structure yet” fallback state.
-- [~] Add registry cleanup/migration hooks in world state versioning (basic cap/retention implemented; migration hooks pending).
+- [x] Add registry cleanup/migration hooks in world state versioning.
 
 ### Z. Teleport safety hardening
 - [x] Implement safe-landing resolver that probes vertical space for non-suffocating target.
