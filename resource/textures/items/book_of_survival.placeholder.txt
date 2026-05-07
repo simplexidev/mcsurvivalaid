@@ -1,1 +1,1 @@
-Placeholder intentionally omitted in git (binary-free workflow).
+Create `book_of_survival.png` here.

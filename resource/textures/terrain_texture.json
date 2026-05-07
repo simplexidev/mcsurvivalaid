@@ -3,10 +3,18 @@
   "texture_name": "atlas.terrain",
   "texture_data": {
     "survival_chest": {
-      "textures": "textures/blocks/survival_chest"
+      "textures": [
+        "textures/blocks/survival_chest_top",
+        "textures/blocks/survival_chest_side",
+        "textures/blocks/survival_chest_bottom"
+      ]
     },
     "survival_chest_ready": {
-      "textures": "textures/blocks/survival_chest_ready"
+      "textures": [
+        "textures/blocks/survival_chest_ready_top",
+        "textures/blocks/survival_chest_ready_side",
+        "textures/blocks/survival_chest_ready_bottom"
+      ]
     }
   }
 }
