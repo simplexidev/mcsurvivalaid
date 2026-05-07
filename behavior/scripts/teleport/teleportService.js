@@ -11,6 +11,7 @@ export function handlePlayerDeath(event) {
   const worldDay = getCurrentWorldDay();
   state.classTrack.lastDeathDay = worldDay;
   state.classTrack.classTrackStartDay = worldDay;
+  state.classTrack.tier5ClaimedCurrent = false;
   setPlayerState(dead, state);
 }
 

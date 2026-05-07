@@ -362,10 +362,10 @@ Legend:
 ## V. Remaining code-complete items (must all be implemented)
 
 ### W. Quest metric expansion (travel)
-- [ ] Implement boat travel metric source hardening (dimension changes, dismount edge cases, speed spike guard tuning).
-- [ ] Implement boat travel tier balancing pass for thresholds and rewards.
-- [ ] Implement glide/elytra metric source hardening (launch/landing edge cases, teleport false positives).
-- [ ] Implement glide/elytra tier balancing pass for thresholds and rewards.
+- [x] Implement boat travel metric source hardening (dimension changes, dismount edge cases, speed spike guard tuning).
+- [x] Implement boat travel tier balancing pass for thresholds and rewards.
+- [x] Implement glide/elytra metric source hardening (launch/landing edge cases, teleport false positives).
+- [x] Implement glide/elytra tier balancing pass for thresholds and rewards.
 
 ### X. Quest metric expansion (combat/equipment lifecycle)
 - [x] Implement crafted weapon/armor metric collection (best-effort event path + gear category mapping).
@@ -391,7 +391,7 @@ Legend:
 - [x] Enforce class completion rule through explicit Tier-5 claim marker persisted independently from claimed-day list.
 - [x] Add migration for existing player states to new explicit completion marker (default merge path + runtime initialization).
 - [x] Block class switching for classes not meeting completion rule in all prompt flows.
-- [ ] Add regression checks for death/reset interactions with completion markers.
+- [x] Add regression checks for death/reset interactions with completion markers (death handler resets class-track marker).
 
 ### AB. Reward-claim transaction robustness
 - [x] Add per-reward grant result capture (inventory add/drop status).

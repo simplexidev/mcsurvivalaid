@@ -14,6 +14,12 @@ export function tickTravelTracking() {
       const dz = current.z - previous.z;
       const horizontalDistance = Math.sqrt(dx * dx + dz * dz);
 
+      // Teleport/lag spike guard: ignore and reset baseline for extreme jumps
+      if (horizontalDistance > 80 || Math.abs(dy) > 60) {
+        lastPositions.set(player.id, { x: current.x, y: current.y, z: current.z, dimensionId: player.dimension.id, wasRidingBoat: false, wasGliding: player.isGliding });
+        continue;
+      }
+
       if (horizontalDistance > 0.01 && horizontalDistance < 20) {
         addQuestProgress(player, "travel", "horizontal_distance", horizontalDistance);
       }
@@ -22,12 +28,16 @@ export function tickTravelTracking() {
         addQuestProgress(player, "travel", "swim_distance", horizontalDistance);
       }
 
-      if (player.isGliding && horizontalDistance > 0.01 && horizontalDistance < 60) {
+      const isGlidingNow = player.isGliding === true;
+      const wasGliding = previous.wasGliding === true;
+      if (isGlidingNow && horizontalDistance > 0.01 && horizontalDistance < 60 && (wasGliding || horizontalDistance < 20)) {
         addQuestProgress(player, "travel", "glide_distance", horizontalDistance);
       }
 
       const riding = player.getComponent("minecraft:riding")?.entityRidingOn;
-      if (riding?.typeId === "minecraft:boat" && horizontalDistance > 0.01 && horizontalDistance < 30) {
+      const isBoatNow = riding?.typeId === "minecraft:boat";
+      const wasBoat = previous.wasRidingBoat === true;
+      if (isBoatNow && horizontalDistance > 0.01 && horizontalDistance < 30 && (wasBoat || horizontalDistance < 8)) {
         addQuestProgress(player, "travel", "boat_distance", horizontalDistance);
       }
 
@@ -40,6 +50,7 @@ export function tickTravelTracking() {
       }
     }
 
-    lastPositions.set(player.id, { x: current.x, y: current.y, z: current.z, dimensionId: player.dimension.id });
+    const ridingNow = player.getComponent("minecraft:riding")?.entityRidingOn;
+    lastPositions.set(player.id, { x: current.x, y: current.y, z: current.z, dimensionId: player.dimension.id, wasRidingBoat: ridingNow?.typeId === "minecraft:boat", wasGliding: player.isGliding === true });
   }
 }
