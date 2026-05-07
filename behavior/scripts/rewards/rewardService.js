@@ -3,12 +3,14 @@ import { CLASS_REWARDS, CLASSLESS_RECURRING_REWARD } from "./rewardDefinitions.j
 import { getEarnedClassRewardDays } from "./rewardSchedule.js";
 import { getPlayerState, setPlayerState } from "../state/playerState.js";
 import { collectReadyItemRequests } from "../items/requestService.js";
+import { maybePromptClassChange } from "../classes/classService.js";
 
 export function tickRewardService() {
   for (const player of world.getPlayers()) {
     const state = getPlayerState(player);
     if (!state.enabled || !state.classTrack.currentClass) continue;
     const worldDay = getCurrentWorldDay();
+    maybePromptClassChange(player, worldDay);
     const classTrackDays = Math.max(0, worldDay - state.classTrack.classTrackStartDay);
     const earnedDays = getEarnedClassRewardDays(classTrackDays, state.classTrack.claimedClassRewardDays, state.classTrack.pendingClassRewardDays);
     if (earnedDays.length > 0) {
