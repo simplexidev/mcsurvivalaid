@@ -18,15 +18,13 @@ system.beforeEvents.startup.subscribe((event) => {
 });
 
 world.afterEvents.playerSpawn.subscribe((event) => {
+  const delay = event.initialSpawn ? 40 : 5;
   if (event.initialSpawn) {
-    system.run(() => {
+    system.runTimeout(() => {
       ensureWorldStateInitialized();
       handleInitialSpawn(event.player);
-    }
-    );
+    }, delay);
   }
-  const delay = event.initialSpawn ? 40 : 5;
-  system.runTimeout(() => handleInitialSpawn(event.player), delay);
 });
 
 world.afterEvents.entityDie.subscribe((event) => {
