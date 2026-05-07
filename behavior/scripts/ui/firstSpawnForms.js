@@ -26,15 +26,27 @@ export async function handleInitialSpawn(player) {
 
 async function showClassSelection(player) {
   const classes = getClassList();
-  const form = new ActionFormData().title("Choose Your Class").body("Pick your first Survival Aid class.");
-  for (const c of classes) form.button(`${c.name}\n${c.description}`);
-  const result = await form.show(player);
-  if (result.canceled || result.selection === undefined) return;
-
-  const selectedClass = classes[result.selection];
-  setInitialClass(player, selectedClass.id);
-  giveStarterItems(player);
-  player.sendMessage(`Survival Aid enabled. Class selected: ${selectedClass.name}.`);
+  while (true) {
+    const form = new ActionFormData().title("Choose Your Class").body("Pick your first Survival Aid class.");
+    for (const c of classes) form.button(`${c.name}\n${c.description}`);
+    const result = await form.show(player);
+    if (!result.canceled && result.selection !== undefined) {
+      const selectedClass = classes[result.selection];
+      setInitialClass(player, selectedClass.id);
+      giveStarterItems(player);
+      player.sendMessage(`Survival Aid enabled. Class selected: ${selectedClass.name}.`);
+      return;
+    }
+    const retry = await new MessageFormData().title("Class Selection Required").body("You must pick a class to enable Survival Aid now. Continue selecting?").button1("Continue").button2("Disable Survival Aid").show(player);
+    if (retry.canceled || retry.selection !== 0) {
+      const state = getPlayerState(player);
+      state.hasSeenInitialPrompt = true;
+      state.enabled = false;
+      setPlayerState(player, state);
+      player.sendMessage("Survival Aid disabled for your player profile.");
+      return;
+    }
+  }
 }
 
 export function giveStarterItems(player) {

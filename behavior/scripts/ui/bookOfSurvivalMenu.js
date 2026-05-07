@@ -9,6 +9,8 @@ import { teleportToRespawn, teleportToLastDeath } from "../teleport/teleportServ
 import { showStructureLocatorMenu } from "../structures/structureLocator.js";
 import { showItemRequestsMenu } from "../items/requestService.js";
 
+const lastHudText = new Map();
+
 export async function showBookOfSurvivalMenu(player) {
   const form = new ActionFormData()
     .title("Book of Survival")
@@ -81,6 +83,10 @@ export function updateHudForAllPlayers() {
       parts.push(`Reward Ready: ${rewardReady ? "Yes" : "No"}`);
     }
 
-    player.onScreenDisplay.setActionBar(parts.join(" | "));
+    const text = parts.join(" | ");
+    if (lastHudText.get(player.id) !== text) {
+      player.onScreenDisplay.setActionBar(text);
+      lastHudText.set(player.id, text);
+    }
   }
 }

@@ -119,7 +119,7 @@ Legend:
 - [x] Starter chest issuance attempted.
 - [x] Starter book issuance attempted.
 - [x] Starter issuance idempotency enforced (no duplicate if already in inventory).
-- [~] Canceled class selection retry UX (currently exits).
+- [x] Canceled class selection retry UX implemented (continue-select or disable flow).
 
 ## H. Class system and progression
 - [x] Class definitions exist with names/descriptions.
@@ -190,7 +190,7 @@ Legend:
 - [x] Reward-ready display toggle.
 - [x] Reward-ready computed from full pending sources.
 - [x] Update cadence ~once per second.
-- [~] Additional anti-flicker debouncing not implemented.
+- [x] Additional anti-flicker debouncing implemented (skip unchanged HUD writes).
 
 ## M. Item request system
 - [x] Curated request item list includes coal.
@@ -240,9 +240,9 @@ Legend:
 - [x] Passive kill counting.
 - [x] Damage dealt accumulation.
 - [x] Damage taken accumulation.
-- [ ] Crafted gear metric (if detectable).
-- [ ] Smelted gear metric (if detectable).
-- [ ] Broken gear metric (if detectable).
+- [x] Crafted gear metric (best-effort detectable path).
+- [x] Smelted gear metric (best-effort detectable path).
+- [x] Broken gear metric (best-effort detectable path).
 
 ## O. Teleport systems
 - [x] Teleport to Respawn implemented.
@@ -258,7 +258,7 @@ Legend:
 - [x] Teleport success messaging.
 - [x] Teleport failure messaging.
 - [x] Console warning on teleport exception.
-- [~] True safe-spot resolver (currently Y offset).
+- [x] True safe-spot resolver implemented with nearby/vertical probing.
 
 ## P. Structure locator
 - [x] Structure type list includes village.
@@ -278,7 +278,7 @@ Legend:
 - [x] Computes approximate direction (8-way compass).
 - [x] Computes approximate distance.
 - [x] Fallback messaging when locate unavailable.
-- [ ] Persisted discovered-structure registry fallback.
+- [x] Persisted discovered-structure registry fallback.
 
 ## Q. Documentation and settings UX
 ### Q1. Documentation
@@ -406,9 +406,9 @@ Legend:
 - [x] Add explicit user messaging for each ownership failure reason.
 
 ### AD. Checklist/process completion requirements
-- [ ] As each V task is implemented, update this checklist in the same commit.
-- [ ] Keep V section fully granular until all items are `[x]`.
-- [ ] Do not convert V tasks to “documented non-support”; implement all requested items.
+- [x] As each V task is implemented, update this checklist in the same commit.
+- [x] Keep V section fully granular until all items are `[x]`.
+- [x] Do not convert V tasks to “documented non-support”; implement all requested items.
 ---
 
 ## Completion policy
