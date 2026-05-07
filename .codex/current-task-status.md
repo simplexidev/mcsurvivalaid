@@ -400,10 +400,10 @@ Legend:
 - [x] Add defensive logging for failed grant/drop operations.
 
 ### AC. Multiplayer ownership hardening
-- [ ] Add optional chest ownership token persisted separately from location for stronger anti-theft verification.
-- [ ] Prevent claims when owner token mismatch detected even at matching coordinates.
-- [ ] Add behavior for stale chest records (missing block / replaced block / dimension mismatch).
-- [ ] Add explicit user messaging for each ownership failure reason.
+- [x] Add optional chest ownership token persisted separately from location for stronger anti-theft verification.
+- [x] Prevent claims when owner token mismatch detected even at matching coordinates.
+- [x] Add behavior for stale chest records (missing block / replaced block / dimension mismatch).
+- [x] Add explicit user messaging for each ownership failure reason.
 
 ### AD. Checklist/process completion requirements
 - [ ] As each V task is implemented, update this checklist in the same commit.

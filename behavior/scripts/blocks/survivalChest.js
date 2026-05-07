@@ -1,4 +1,4 @@
-import { ItemStack, world } from "@minecraft/server";
+import { ItemStack, world, system } from "@minecraft/server";
 import { ADDON } from "../constants.js";
 import { getPlayerState, setPlayerState } from "../state/playerState.js";
 import { claimPendingRewards, hasPendingRewards } from "../rewards/rewardService.js";
@@ -11,28 +11,47 @@ export function registerSurvivalChestComponent(event) {
       const state = getPlayerState(player);
       if (state.chest.placed && state.chest.location) {
         player.sendMessage("You can only have one Survival Chest.");
-        // Best effort: remove duplicate placement and refund item.
         try { args.block.setType("minecraft:air"); } catch {}
         const inv = player.getComponent("minecraft:inventory")?.container;
         if (inv) inv.addItem(new ItemStack(ADDON.blocks.survivalChest, 1));
         return;
       }
       state.chest.placed = true;
-      state.chest.location = { ownerId: player.id, dimension: args.block.dimension.id, x: args.block.location.x, y: args.block.location.y, z: args.block.location.z };
+      state.chest.location = {
+        ownerId: player.id,
+        ownerToken: `${player.id}:${system.currentTick}`,
+        dimension: args.block.dimension.id,
+        x: args.block.location.x,
+        y: args.block.location.y,
+        z: args.block.location.z
+      };
       setPlayerState(player, state);
       syncChestVisualForPlayer(player);
     },
+
     onPlayerInteract(args) {
       const player = args.player;
       if (!player) return;
       const state = getPlayerState(player);
       if (!state.chest.location) return;
-      const b = args.block.location;
+
       const own = state.chest.location;
-      if (own.dimension !== args.block.dimension.id || own.x !== b.x || own.y !== b.y || own.z !== b.z) return player.sendMessage("This is not your registered Survival Chest.");
+      const b = args.block.location;
+
+      if (!own.ownerToken || own.ownerId !== player.id) {
+        player.sendMessage("Chest ownership validation failed (owner token mismatch).");
+        return;
+      }
+
+      if (own.dimension !== args.block.dimension.id || own.x !== b.x || own.y !== b.y || own.z !== b.z) {
+        player.sendMessage("This is not your registered Survival Chest.");
+        return;
+      }
+
       claimPendingRewards(player);
       tryUpdateChestVisual(args.block, player);
     },
+
     onPlayerDestroy(args) {
       const player = args.player;
       if (!player) return;
@@ -41,8 +60,7 @@ export function registerSurvivalChestComponent(event) {
       const b = args.block.location;
       const own = state.chest.location;
       if (own.dimension === args.block.dimension.id && own.x === b.x && own.y === b.y && own.z === b.z) {
-        state.chest.placed = false;
-        state.chest.location = null;
+        clearChestRegistration(state);
         setPlayerState(player, state);
       }
     }
@@ -55,9 +73,16 @@ export function syncChestVisualForPlayer(player) {
   try {
     const dim = world.getDimension(state.chest.location.dimension);
     const block = dim.getBlock({ x: state.chest.location.x, y: state.chest.location.y, z: state.chest.location.z });
-    if (!block || block.typeId !== ADDON.blocks.survivalChest) return;
+    if (!block || block.typeId !== ADDON.blocks.survivalChest) {
+      clearChestRegistration(state);
+      setPlayerState(player, state);
+      player.sendMessage("Your registered Survival Chest was missing or replaced; registration cleared.");
+      return;
+    }
     tryUpdateChestVisual(block, player);
-  } catch {}
+  } catch {
+    player.sendMessage("Could not access your registered Survival Chest dimension; registration preserved.");
+  }
 }
 
 function tryUpdateChestVisual(block, player) {
@@ -65,4 +90,9 @@ function tryUpdateChestVisual(block, player) {
   if (!state.settings.chestChangesTexture) return;
   const ready = hasPendingRewards(player);
   try { block.setPermutation(block.permutation.withState("simplexidev:has_reward", ready)); } catch {}
+}
+
+function clearChestRegistration(state) {
+  state.chest.placed = false;
+  state.chest.location = null;
 }
