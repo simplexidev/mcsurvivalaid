@@ -75,7 +75,9 @@ export function updateHudForAllPlayers() {
       parts.push(`Class Track Days: ${classTrackDays}`);
     }
 
-    parts.push(`Reward Ready: ${rewardReady ? "Yes" : "No"}`);
+    if (state.settings.showRewardReady) {
+      parts.push(`Reward Ready: ${rewardReady ? "Yes" : "No"}`);
+    }
 
     player.onScreenDisplay.setActionBar(parts.join(" | "));
   }

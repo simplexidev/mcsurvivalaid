@@ -3,8 +3,9 @@ import { getPlayerStateKey } from "./storageKeys.js";
 
 export function createDefaultPlayerState() {
   return {
+    stateVersion: 1,
+    hasSeenInitialPrompt: false,
     enabled: false,
-
     classTrack: {
       currentClass: null,
       completedClasses: [],
@@ -14,64 +15,28 @@ export function createDefaultPlayerState() {
       pendingClassRewardDays: [],
       nextClassChangePromptDay: 20
     },
-
-    deaths: {
-      lastDeathLocation: null
-    },
-
-    chest: {
-      placed: false,
-      location: null
-    },
-
-    requests: {
-      active: []
-    },
-
-    quests: {
-      travel: {},
-      blocksBroken: {},
-      blocksPlaced: {},
-      combat: {},
-      claimedQuestRewards: [],
-      pendingQuestRewards: []
-    },
-
+    deaths: { lastDeathLocation: null },
+    chest: { placed: false, location: null },
+    requests: { active: [] },
+    quests: { travel: {}, blocksBroken: {}, blocksPlaced: {}, combat: {}, claimedQuestRewards: [], pendingQuestRewards: [] },
+    cooldowns: { respawnTeleportReadyTick: 0, deathTeleportReadyTick: 0 },
     settings: {
-      showHud: true,
-      showDaysSurvived: true,
-      showDaysUntilReward: true,
-      chestChangesTexture: true,
-      allowTeleportToDeath: true,
-      allowTeleportToRespawn: true
+      showHud: true, showDaysSurvived: true, showDaysUntilReward: true, showRewardReady: true,
+      chestChangesTexture: true, allowTeleportToDeath: true, allowTeleportToRespawn: true,
+      teleportCooldownSeconds: 60
     }
   };
 }
 
 export function getPlayerState(player) {
   const raw = world.getDynamicProperty(getPlayerStateKey(player));
-
-  if (typeof raw !== "string" || raw.length === 0) {
-    return createDefaultPlayerState();
-  }
-
+  if (typeof raw !== "string" || raw.length === 0) return createDefaultPlayerState();
   try {
-    return {
-      ...createDefaultPlayerState(),
-      ...JSON.parse(raw)
-    };
-  } catch {
-    return createDefaultPlayerState();
-  }
+    const parsed = JSON.parse(raw);
+    const d = createDefaultPlayerState();
+    return { ...d, ...parsed, classTrack: { ...d.classTrack, ...(parsed.classTrack ?? {}) }, deaths: { ...d.deaths, ...(parsed.deaths ?? {}) }, chest: { ...d.chest, ...(parsed.chest ?? {}) }, requests: { ...d.requests, ...(parsed.requests ?? {}) }, quests: { ...d.quests, ...(parsed.quests ?? {}) }, cooldowns: { ...d.cooldowns, ...(parsed.cooldowns ?? {}) }, settings: { ...d.settings, ...(parsed.settings ?? {}) } };
+  } catch { return createDefaultPlayerState(); }
 }
 
-export function setPlayerState(player, state) {
-  world.setDynamicProperty(getPlayerStateKey(player), JSON.stringify(state));
-}
-
-export function updatePlayerState(player, updater) {
-  const state = getPlayerState(player);
-  const updated = updater(state) ?? state;
-  setPlayerState(player, updated);
-  return updated;
-}
+export function setPlayerState(player, state) { world.setDynamicProperty(getPlayerStateKey(player), JSON.stringify(state)); }
+export function updatePlayerState(player, updater) { const state = getPlayerState(player); const updated = updater(state) ?? state; setPlayerState(player, updated); return updated; }
