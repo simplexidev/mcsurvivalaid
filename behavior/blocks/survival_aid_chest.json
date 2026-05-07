@@ -18,15 +18,14 @@
       "minecraft:destructible_by_explosion": {
         "explosion_resistance": 15
       },
+      "minecraft:geometry": "geometry.survival_aid_chest",
       "minecraft:material_instances": {
         "*": {
           "texture": "survival_aid_chest",
           "render_method": "opaque"
         }
       },
-      "minecraft:custom_components": [
-        "simplexidev:survival_aid_chest_component"
-      ]
+      "simplexidev:survival_aid_chest_component": {}
     },
     "permutations": [
       {
@@ -45,7 +44,7 @@
         "components": {
           "minecraft:material_instances": {
             "*": {
-              "texture": "survival_aid_chest_front",
+              "texture": "survival_aid_chest",
               "render_method": "opaque"
             }
           }

@@ -4,20 +4,21 @@
     "description": {
       "identifier": "simplexidev:book_of_survival"
     },
-
-
     "tags": [ "crafting_table" ],
     "ingredients": [
       {
         "item": "minecraft:book"
       },
       {
-        "item": "minecraft:dye",
-        "data": 0
+        "item": "minecraft:paper"
       }
     ],
     "result": {
-      "item": "simplexidev:book_of_survival"
+      "item": "simplexidev:book_of_survival",
+      "count": 1
+    },
+    "unlock": {
+      "context": "AlwaysUnlocked"
     }
   }
 }
