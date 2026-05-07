@@ -37,6 +37,7 @@ export function teleportToRespawn(player) {
     const safe = resolveSafeTarget(dimension, target.x + 0.5, target.y + 1, target.z + 0.5);
     if (!safe) return player.sendMessage("No safe respawn-adjacent position found.");
     player.teleport(safe, { dimension });
+    applyPostTeleportSafety(player);
     player.sendMessage("Teleported to respawn.");
   } catch (e) {
     player.sendMessage("Teleport to respawn failed.");
@@ -55,6 +56,7 @@ export function teleportToLastDeath(player) {
     const safe = resolveSafeTarget(dimension, lastDeath.x + 0.5, lastDeath.y + 2, lastDeath.z + 0.5);
     if (!safe) return player.sendMessage("No safe last-death-adjacent position found.");
     player.teleport(safe, { dimension });
+    applyPostTeleportSafety(player);
     player.sendMessage(`Teleported to last death (${lastDeath.x}, ${lastDeath.y}, ${lastDeath.z}).`);
   } catch (e) {
     player.sendMessage("Teleport to last death failed. Dimension/location unavailable.");
@@ -88,4 +90,11 @@ function isSafeStand(dimension, x, y, z) {
   } catch {
     return false;
   }
+}
+
+
+function applyPostTeleportSafety(player) {
+  try {
+    player.runCommandAsync("effect @s resistance 6 1 true");
+  } catch {}
 }
