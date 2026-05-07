@@ -7,7 +7,8 @@
         "category": "items"
       },
       "states": {
-        "simplexidev:has_reward": [false, true]
+        "simplexidev:has_reward": [false, true],
+        "simplexidev:is_open": [false, true]
       }
     },
     "components": {
@@ -35,6 +36,17 @@
           "minecraft:material_instances": {
             "*": {
               "texture": "survival_aid_chest_alt",
+              "render_method": "opaque"
+            }
+          }
+        }
+      },
+      {
+        "condition": "q.block_state('simplexidev:is_open') == true",
+        "components": {
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "survival_aid_chest_front",
               "render_method": "opaque"
             }
           }

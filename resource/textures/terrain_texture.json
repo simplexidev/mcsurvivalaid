@@ -6,14 +6,14 @@
       "textures": [
         "textures/blocks/survival_aid_chest_top",
         "textures/blocks/survival_aid_chest_side",
-        "textures/blocks/survival_aid_chest_bottom"
+        "textures/blocks/survival_aid_chest_side"
       ]
     },
     "survival_aid_chest_alt": {
       "textures": [
-        "textures/blocks/survival_aid_chest_alt_top",
-        "textures/blocks/survival_aid_chest_alt_side",
-        "textures/blocks/survival_aid_chest_alt_bottom"
+        "textures/blocks/survival_aid_chest_front",
+        "textures/blocks/survival_aid_chest_front",
+        "textures/blocks/survival_aid_chest_top"
       ]
     }
   }

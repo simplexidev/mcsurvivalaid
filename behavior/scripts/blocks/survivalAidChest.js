@@ -48,6 +48,7 @@ export function registerSurvivalChestComponent(event) {
         return;
       }
 
+      pulseOpenState(args.block);
       claimPendingRewards(player);
       tryUpdateChestVisual(args.block, player);
     },
@@ -95,4 +96,17 @@ function tryUpdateChestVisual(block, player) {
 function clearChestRegistration(state) {
   state.chest.placed = false;
   state.chest.location = null;
+}
+
+function pulseOpenState(block) {
+  try {
+    block.setPermutation(block.permutation.withState("simplexidev:is_open", true));
+    system.runTimeout(() => {
+      try {
+        const current = block.dimension.getBlock(block.location);
+        if (!current) return;
+        current.setPermutation(current.permutation.withState("simplexidev:is_open", false));
+      } catch {}
+    }, 10);
+  } catch {}
 }

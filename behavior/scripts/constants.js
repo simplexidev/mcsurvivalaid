@@ -4,7 +4,7 @@ export const ADDON = {
   author: "SimplexiDev",
 
   blocks: {
-    survivalChest: "simplexidev:survival_chest"
+    survivalChest: "simplexidev:survival_aid_chest"
   },
 
   items: {
@@ -12,7 +12,7 @@ export const ADDON = {
   },
 
   components: {
-    survivalChest: "simplexidev:survival_chest_component",
+    survivalChest: "simplexidev:survival_aid_chest_component",
     bookOfSurvival: "simplexidev:book_of_survival_component"
   }
 };

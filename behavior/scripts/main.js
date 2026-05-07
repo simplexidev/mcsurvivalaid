@@ -1,7 +1,7 @@
 import { world, system } from "@minecraft/server";
 
 import { ADDON } from "./constants.js";
-import { registerSurvivalChestComponent, syncChestVisualForPlayer } from "./blocks/survivalChest.js";
+import { registerSurvivalChestComponent, syncChestVisualForPlayer } from "./blocks/survivalAidChest.js";
 import { registerBookOfSurvivalComponent } from "./items/bookOfSurvival.js";
 import { handleInitialSpawn } from "./ui/firstSpawnForms.js";
 import { updateHudForAllPlayers } from "./ui/bookOfSurvivalMenu.js";
