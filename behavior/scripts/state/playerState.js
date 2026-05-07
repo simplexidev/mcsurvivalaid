@@ -13,6 +13,7 @@ export function createDefaultPlayerState() {
       lastDeathDay: 0,
       claimedClassRewardDays: [],
       pendingClassRewardDays: [],
+      partialClassRewards: {},
       nextClassChangePromptDay: 20,
       tier5ClaimedCurrent: false
     },

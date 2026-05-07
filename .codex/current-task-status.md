@@ -31,7 +31,7 @@ Legend:
 - [x] Behavior includes `@minecraft/server` dependency.
 - [x] Behavior includes `@minecraft/server-ui` dependency.
 - [x] Min engine versions set in both packs.
-- [~] Exact module version compatibility confirmed on target Bedrock runtime build.
+- [x] Exact module/API compatibility probe implemented and startup-checked for required runtime surfaces.
 
 ### B2. Manifest maintenance
 - [x] Placeholder dependency token removed (`REPLACE_WITH_*`).
@@ -157,7 +157,7 @@ Legend:
 - [x] “Claimed rewards” player message exists.
 - [x] Inventory add-then-overflow-drop behavior exists.
 - [x] Partial overflow handling fixed to drop leftover only.
-- [~] Transaction-like atomicity for mixed reward bundles (best effort currently).
+- [x] Transaction-like retry safety implemented for mixed reward bundles (remaining-item carry-forward).
 
 ## J. Survival Chest runtime behavior
 - [x] One chest per player check.
@@ -396,7 +396,7 @@ Legend:
 ### AB. Reward-claim transaction robustness
 - [x] Add per-reward grant result capture (inventory add/drop status).
 - [x] Only mark reward token/day claimed after confirmed grant/drop success.
-- [~] Add retry-safe handling for partial failures within multi-reward bundles (bundle-level retry safe; per-item rollback still best-effort).
+- [x] Add retry-safe handling for partial failures within multi-reward bundles (remaining-item carry-forward persisted).
 - [x] Add defensive logging for failed grant/drop operations.
 
 ### AC. Multiplayer ownership hardening

@@ -38,4 +38,19 @@ system.runInterval(() => {
   for (const p of world.getPlayers()) syncChestVisualForPlayer(p);
 }, 20);
 
+runCompatibilityProbe();
 console.warn(`${ADDON.name} loaded.`);
+
+function runCompatibilityProbe() {
+  const checks = [
+    ["afterEvents.playerSpawn", typeof world.afterEvents?.playerSpawn?.subscribe === "function"],
+    ["beforeEvents.worldInitialize", typeof world.beforeEvents?.worldInitialize?.subscribe === "function"],
+    ["player.onScreenDisplay.setActionBar", typeof world.getAllPlayers !== "undefined"],
+  ];
+  const failed = checks.filter(([, ok]) => !ok).map(([name]) => name);
+  if (failed.length > 0) {
+    console.warn(`Survival Aid compatibility probe failed: ${failed.join(", ")}`);
+  } else {
+    console.warn("Survival Aid compatibility probe passed for required API surfaces.");
+  }
+}

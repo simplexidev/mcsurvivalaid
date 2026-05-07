@@ -33,13 +33,18 @@ export function claimPendingRewards(player) {
   if (state.classTrack.currentClass) {
     const keepPendingClass = [];
     for (const rewardDay of [...state.classTrack.pendingClassRewardDays]) {
-      const ok = grantRewardBundle(player, getClassRewardsForDay(state.classTrack.currentClass, rewardDay));
-      if (ok) {
+      const key = String(rewardDay);
+      const bundle = state.classTrack.partialClassRewards?.[key] ?? getClassRewardsForDay(state.classTrack.currentClass, rewardDay);
+      const result = grantRewardBundle(player, bundle);
+      if (result.ok) {
         state.classTrack.claimedClassRewardDays.push(rewardDay);
         if (rewardDay >= 20) state.classTrack.tier5ClaimedCurrent = true;
+        if (state.classTrack.partialClassRewards) delete state.classTrack.partialClassRewards[key];
         grantedAny = true;
       } else {
         keepPendingClass.push(rewardDay);
+        state.classTrack.partialClassRewards ??= {};
+        state.classTrack.partialClassRewards[key] = result.remaining;
       }
     }
     state.classTrack.pendingClassRewardDays = keepPendingClass;
@@ -47,12 +52,12 @@ export function claimPendingRewards(player) {
 
   const keepPendingQuests = [];
   for (const quest of [...state.quests.pendingQuestRewards]) {
-    const ok = grantRewardBundle(player, quest.rewards);
-    if (ok) {
+    const result = grantRewardBundle(player, quest.rewards);
+    if (result.ok) {
       state.quests.claimedQuestRewards.push(quest.token);
       grantedAny = true;
     } else {
-      keepPendingQuests.push(quest);
+      keepPendingQuests.push({ ...quest, rewards: result.remaining });
     }
   }
   state.quests.pendingQuestRewards = keepPendingQuests;
@@ -75,14 +80,18 @@ export function getCurrentWorldDay() { return Math.floor(world.getAbsoluteTime()
 function getClassRewardsForDay(classId, rewardDay) { return CLASS_REWARDS[classId]?.[rewardDay] ?? CLASSLESS_RECURRING_REWARD; }
 
 function grantRewardBundle(player, rewards) {
+  const remaining = [];
+  let failure = false;
   for (const reward of rewards) {
+    if (failure) { remaining.push(reward); continue; }
     const ok = giveOrDrop(player, reward.itemId, reward.amount);
     if (!ok) {
       console.warn(`Survival Aid failed reward grant for ${reward.itemId} x${reward.amount}`);
-      return false;
+      remaining.push(reward);
+      failure = true;
     }
   }
-  return true;
+  return { ok: !failure, remaining };
 }
 
 function giveOrDrop(player, itemId, amount) {
