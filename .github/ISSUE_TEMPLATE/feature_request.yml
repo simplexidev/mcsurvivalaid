@@ -1,0 +1,13 @@
+name: Feature request
+description: Suggest an enhancement
+body:
+  - type: input
+    attributes: {label: Feature summary}
+  - type: textarea
+    attributes: {label: Gameplay purpose}
+  - type: dropdown
+    attributes: {label: Affects balance?, options: [Yes, No, Maybe]}
+  - type: textarea
+    attributes: {label: Suggested implementation details}
+  - type: textarea
+    attributes: {label: Alternatives considered}

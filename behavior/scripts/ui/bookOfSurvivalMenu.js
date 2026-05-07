@@ -6,6 +6,7 @@ import { showSettingsMenu } from "./settingsMenu.js";
 import { showDocumentationMenu } from "./documentationMenu.js";
 import { teleportToRespawn, teleportToLastDeath } from "../teleport/teleportService.js";
 import { showStructureLocatorMenu } from "../structures/structureLocator.js";
+import { showItemRequestsMenu } from "../items/requestService.js";
 
 export async function showBookOfSurvivalMenu(player) {
   const form = new ActionFormData()
@@ -30,7 +31,7 @@ export async function showBookOfSurvivalMenu(player) {
       break;
 
     case 1:
-      player.sendMessage("Item Requests are not implemented yet.");
+      await showItemRequestsMenu(player);
       break;
 
     case 2:

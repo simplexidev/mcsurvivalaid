@@ -1,0 +1,21 @@
+name: Bug report
+description: Report a gameplay or scripting bug
+body:
+  - type: input
+    attributes: {label: Minecraft Bedrock version}
+  - type: input
+    attributes: {label: Platform}
+  - type: dropdown
+    attributes: {label: Experimental toggles enabled?, options: [Yes, No, Unsure]}
+  - type: input
+    attributes: {label: Behavior/Resource pack versions}
+  - type: textarea
+    attributes: {label: Reproduction steps}
+  - type: textarea
+    attributes: {label: Expected behavior}
+  - type: textarea
+    attributes: {label: Actual behavior}
+  - type: textarea
+    attributes: {label: Content log errors}
+  - type: textarea
+    attributes: {label: Screenshots/video links}

@@ -1,26 +1,41 @@
-# Survival Aid
+# Survival Aid (Beta)
+Bedrock Edition add-on by SimplexiDev. **Bedrock-only** (not Java mods).
 
-Minecraft Bedrock Edition Add-On by SimplexiDev.
+## Status
+Beta, feature-complete scaffold with placeholder art assets.
 
-## Custom Content
+## Features
+- Survival Chest (`simplexidev:survival_chest`) reward terminal.
+- Book of Survival (`simplexidev:book_of_survival`) UI hub.
+- First-spawn enable + class select flow.
+- Per-player dynamic-property state, class tracking, HUD, quests/rewards scaffolding.
+- Teleport to respawn and last death helpers.
+- Structure locator with command-first approach and fallback messaging.
 
-- Block: `simplexidev:survival_chest`
-- Item: `simplexidev:book_of_survival`
+## Requirements
+- Minecraft Bedrock 1.26.20+ target.
+- Script API modules in BP manifest: `@minecraft/server` `2.6.0`, `@minecraft/server-ui` `2.0.0`.
+- Enable script/add-on related experiments if your build still gates APIs.
 
-## Current Boilerplate Includes
+## Install (development packs)
+1. Copy `behavior/` to `development_behavior_packs/SurvivalAid_BP`.
+2. Copy `resource/` to `development_resource_packs/SurvivalAid_RP`.
+3. Activate both packs on a test world.
+4. Ensure Content Log is visible for debugging.
 
-- First-spawn enable/class flow placeholder
-- Book of Survival menu placeholder
-- Survival Chest interaction placeholder
-- Player state storage helpers
-- Reward schedule helpers
-- Quest tracker placeholders
-- Teleport helper placeholders
+## Placeholder assets
+- Binary PNG assets are intentionally omitted in this branch/PR workflow.
+- Text placeholder markers are included:
+  - `resource/textures/blocks/survival_chest.placeholder.txt`
+  - `resource/textures/blocks/survival_chest_ready.placeholder.txt`
+  - `resource/textures/items/book_of_survival.placeholder.txt`
+- Replace these with real PNG files before in-game packaging.
 
-## Notes
+## Known limitations
+- Some quest metrics and structure-locator precision are best-effort due to API/event limits.
+- Full gameplay balancing for rewards is intentionally placeholder.
 
-Replace texture placeholder files with real `.png` textures:
-
-- `resource_packs/SurvivalAid_RP/textures/blocks/survival_chest.png`
-- `resource_packs/SurvivalAid_RP/textures/blocks/survival_chest_ready.png`
-- `resource_packs/SurvivalAid_RP/textures/items/book_of_survival.png`
+## Troubleshooting
+- Check malformed JSON in manifests/textures.
+- Check Content Log for script exceptions.
+- Verify BP dependency UUID points to RP header UUID.

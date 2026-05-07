@@ -1,0 +1,24 @@
+name: validate
+on: [push, pull_request]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate JSON and required files
+        run: |
+          python - <<'PY'
+          import json, pathlib, sys
+          req=[
+            'behavior/manifest.json','resource/manifest.json','README.md','LICENSE.md',
+            'resource/textures/blocks/survival_chest.placeholder.txt','resource/textures/blocks/survival_chest_ready.placeholder.txt','resource/textures/items/book_of_survival.placeholder.txt'
+          ]
+          for p in req:
+            if not pathlib.Path(p).exists():
+              raise SystemExit(f'missing required file: {p}')
+          for p in pathlib.Path('.').rglob('*.json'):
+            json.loads(p.read_text(encoding='utf-8'))
+          if 'REPLACE_WITH_RESOURCE_PACK_HEADER_UUID' in pathlib.Path('behavior/manifest.json').read_text():
+            raise SystemExit('placeholder UUID still present')
+          print('validation ok')
+          PY
