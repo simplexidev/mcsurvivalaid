@@ -382,10 +382,10 @@ Legend:
 - [~] Add registry cleanup/migration hooks in world state versioning (basic cap/retention implemented; migration hooks pending).
 
 ### Z. Teleport safety hardening
-- [ ] Implement safe-landing resolver that probes vertical space for non-suffocating target.
-- [ ] Add fallback to nearby safe offsets when direct target is blocked.
-- [ ] Add short post-teleport safety mitigation (effect and/or reposition retry) where API allows.
-- [ ] Add failure path that preserves cooldown fairness and gives actionable user message.
+- [x] Implement safe-landing resolver that probes vertical space for non-suffocating target.
+- [x] Add fallback to nearby safe offsets when direct target is blocked.
+- [~] Add short post-teleport safety mitigation (effect and/or reposition retry) where API allows (position retry implemented via safe target probing).
+- [x] Add failure path that preserves cooldown fairness and gives actionable user message.
 
 ### AA. Class progression correctness hardening
 - [ ] Enforce class completion rule through explicit Tier-5 claim marker persisted independently from claimed-day list.
