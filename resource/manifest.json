@@ -1,17 +1,29 @@
 {
   "format_version": 2,
   "header": {
-    "name": "Survival Aid RP",
-    "description": "Resource Pack for Survival Aid by SimplexiDev.",
-    "uuid": "8d7aef9f-7225-488b-802c-8e0b58cfea00",
-    "version": [0, 1, 0],
-    "min_engine_version": [1, 21, 20]
+    "name": "Survival Aid Resource Pack",
+    "description": "Resource Pack for the Add-On 'Survival Aid' by SimplexiDev.",
+    "uuid": "4949491a-12af-4464-b99d-5d3ce10fef85",
+    "version": [
+      0,
+      1,
+      0
+    ],
+    "min_engine_version": [
+      1,
+      26,
+      20
+    ]
   },
   "modules": [
     {
       "type": "resources",
-      "uuid": "8cd0817e-80ec-4614-945f-033770cf688d",
-      "version": [0, 1, 0]
+      "uuid": "6012898b-1da8-4947-9c05-bddec9115821",
+      "version": [
+        0,
+        1,
+        0
+      ]
     }
   ]
 }

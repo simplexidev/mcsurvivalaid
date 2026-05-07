@@ -1,11 +1,15 @@
 import { world } from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
 import { getPlayerState } from "../state/playerState.js";
-import { getCurrentWorldDay } from "../rewards/rewardService.js";
+import { getCurrentWorldDay, hasPendingRewards } from "../rewards/rewardService.js";
+import { getNextClassRewardDay } from "../rewards/rewardSchedule.js";
 import { showSettingsMenu } from "./settingsMenu.js";
 import { showDocumentationMenu } from "./documentationMenu.js";
 import { teleportToRespawn, teleportToLastDeath } from "../teleport/teleportService.js";
 import { showStructureLocatorMenu } from "../structures/structureLocator.js";
+import { showItemRequestsMenu } from "../items/requestService.js";
+
+const lastHudText = new Map();
 
 export async function showBookOfSurvivalMenu(player) {
   const form = new ActionFormData()
@@ -30,7 +34,7 @@ export async function showBookOfSurvivalMenu(player) {
       break;
 
     case 1:
-      player.sendMessage("Item Requests are not implemented yet.");
+      await showItemRequestsMenu(player);
       break;
 
     case 2:
@@ -62,7 +66,8 @@ export function updateHudForAllPlayers() {
     const worldDay = getCurrentWorldDay();
     const daysSurvived = Math.max(0, worldDay - state.classTrack.lastDeathDay);
     const classTrackDays = Math.max(0, worldDay - state.classTrack.classTrackStartDay);
-    const rewardReady = state.classTrack.pendingClassRewardDays.length > 0;
+    const nextRewardDay = getNextClassRewardDay(classTrackDays, state.classTrack.claimedClassRewardDays, state.classTrack.pendingClassRewardDays);
+    const rewardReady = hasPendingRewards(player);
 
     const parts = [];
 
@@ -71,11 +76,17 @@ export function updateHudForAllPlayers() {
     }
 
     if (state.settings.showDaysUntilReward) {
-      parts.push(`Class Track Days: ${classTrackDays}`);
+      parts.push(`Days Until Reward: ${Math.max(0, nextRewardDay - classTrackDays)}`);
     }
 
-    parts.push(`Reward Ready: ${rewardReady ? "Yes" : "No"}`);
+    if (state.settings.showRewardReady) {
+      parts.push(`Reward Ready: ${rewardReady ? "Yes" : "No"}`);
+    }
 
-    player.onScreenDisplay.setActionBar(parts.join(" | "));
+    const text = parts.join(" | ");
+    if (lastHudText.get(player.id) !== text) {
+      player.onScreenDisplay.setActionBar(text);
+      lastHudText.set(player.id, text);
+    }
   }
 }
