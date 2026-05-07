@@ -18,12 +18,7 @@ export async function handleInitialSpawn(player) {
   activeInitialPrompts.add(player.id);
 
   const enableForm = new MessageFormData().title("Survival Aid").body("Enable Survival Aid rewards and utilities?").button1("Enable").button2("Disable");
-  const enableResult = await enableForm.show(player);
-  if (enableResult.canceled) {
-    logger.info("firstSpawn", "Player canceled enable form", { playerId: player.id });
-    activeInitialPrompts.delete(player.id);
-    return;
-  }
+  const enableResult = await showRequiredMessageForm(player, enableForm, "initial_enable");
 
   if (enableResult.selection !== 0) {
     state.hasSeenInitialPrompt = true;
@@ -46,8 +41,8 @@ async function showClassSelection(player) {
     const form = new ActionFormData().title("Choose Your Class").body("Pick your first Survival Aid class.");
     for (const c of classes) form.button(`${c.name}
 ${c.description}`);
-    const result = await form.show(player);
-    if (!result.canceled && result.selection !== undefined) {
+    const result = await showRequiredActionForm(player, form, "class_selection");
+    if (result.selection !== undefined) {
       const selectedClass = classes[result.selection];
       logger.info("firstSpawn", "Initial class selected", { playerId: player.id, classId: selectedClass.id });
       setInitialClass(player, selectedClass.id);
@@ -55,8 +50,8 @@ ${c.description}`);
       player.sendMessage(`Survival Aid enabled. Class selected: ${selectedClass.name}.`);
       return;
     }
-    logger.warn("firstSpawn", "Class selection canceled or invalid", { playerId: player.id });
-    const retry = await new MessageFormData().title("Class Selection Required").body("You must pick a class to enable Survival Aid now. Continue selecting?").button1("Continue").button2("Disable Survival Aid").show(player);
+    logger.warn("firstSpawn", "Class selection returned invalid result", { playerId: player.id, result });
+    const retry = await showRequiredMessageForm(player, new MessageFormData().title("Class Selection Required").body("You must pick a class to enable Survival Aid now. Continue selecting?").button1("Continue").button2("Disable Survival Aid"), "class_selection_retry");
     if (retry.canceled || retry.selection !== 0) {
       const state = getPlayerState(player);
       state.hasSeenInitialPrompt = true;
@@ -66,6 +61,22 @@ ${c.description}`);
       logger.info("firstSpawn", "Player exited class prompt and disabled", { playerId: player.id });
       return;
     }
+  }
+}
+
+async function showRequiredMessageForm(player, form, flow) {
+  while (true) {
+    const result = await form.show(player);
+    if (!result.canceled && result.selection !== undefined) return result;
+    logger.warn("firstSpawn", "Required message form canceled; re-showing", { playerId: player.id, flow });
+  }
+}
+
+async function showRequiredActionForm(player, form, flow) {
+  while (true) {
+    const result = await form.show(player);
+    if (!result.canceled && result.selection !== undefined) return result;
+    logger.warn("firstSpawn", "Required action form canceled; re-showing", { playerId: player.id, flow });
   }
 }
 
