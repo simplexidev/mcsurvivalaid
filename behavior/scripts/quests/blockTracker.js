@@ -1,6 +1,10 @@
 import { world } from "@minecraft/server";
 import { addQuestProgress } from "./questService.js";
 
+const GROUND_TAGS = ["dirt", "sand", "gravel", "grass", "mud", "clay", "mycelium", "podzol", "stone", "deepslate", "netherrack", "end_stone"];
+const ORE_TAGS = ["ore", "quartz", "ancient_debris", "raw_iron_block", "raw_gold_block", "raw_copper_block"];
+const FAUNA_TAGS = ["log", "leaves", "flower", "sapling", "mangrove", "azalea", "crop", "bamboo", "vine", "cactus", "melon", "pumpkin"];
+
 export function registerBlockQuestTracking() {
   world.afterEvents.playerBreakBlock.subscribe((event) => {
     const category = classifyBlock(event.brokenBlockPermutation.type.id);
@@ -14,27 +18,12 @@ export function registerBlockQuestTracking() {
 }
 
 function classifyBlock(typeId) {
-  if (typeId.includes("ore") || typeId.includes("quartz")) {
-    return "ore";
-  }
-
-  if (
-    typeId.includes("dirt") ||
-    typeId.includes("sand") ||
-    typeId.includes("gravel") ||
-    typeId.includes("grass")
-  ) {
-    return "ground";
-  }
-
-  if (
-    typeId.includes("log") ||
-    typeId.includes("leaves") ||
-    typeId.includes("flower") ||
-    typeId.includes("sapling")
-  ) {
-    return "fauna";
-  }
-
+  if (includesAny(typeId, ORE_TAGS)) return "ore";
+  if (includesAny(typeId, GROUND_TAGS)) return "ground";
+  if (includesAny(typeId, FAUNA_TAGS)) return "fauna";
   return "decorative";
+}
+
+function includesAny(value, tags) {
+  return tags.some(tag => value.includes(tag));
 }

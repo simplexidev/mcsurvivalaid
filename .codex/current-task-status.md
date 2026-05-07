@@ -233,7 +233,7 @@ Legend:
 - [x] Ore/quartz classification.
 - [x] Fauna classification.
 - [x] Decorative fallback classification.
-- [~] Extended fine-grained vanilla taxonomy coverage.
+- [x] Extended fine-grained vanilla taxonomy coverage (expanded classification token sets).
 
 ### N4. Combat metrics
 - [x] Hostile kill counting.
@@ -335,7 +335,7 @@ Legend:
 - [x] Known limitations section.
 - [x] Troubleshooting section.
 - [x] Link to implementation checklist.
-- [ ] Packaging instructions beyond dev-pack copy (optional enhancement).
+- [x] Packaging instructions beyond dev-pack copy (optional enhancement).
 
 ## U. Manual test execution checklist (required before release)
 - [ ] Clean-world first-spawn flow (enable).

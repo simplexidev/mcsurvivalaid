@@ -43,3 +43,10 @@ Beta, feature-complete scaffold with placeholder art assets.
 
 ## Implementation checklist
 See `.codex/current-task-status.md` for a full, tracked feature checklist.
+
+
+## Packaging (optional)
+1. Replace placeholder texture marker files with real PNG assets.
+2. Zip Behavior Pack and Resource Pack separately (or create `.mcpack` files).
+3. Ensure BP manifest dependency UUID matches RP header UUID.
+4. Import both packs into Bedrock and enable in a test world.
