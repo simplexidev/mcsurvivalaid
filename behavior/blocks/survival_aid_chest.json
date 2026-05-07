@@ -11,6 +11,9 @@
       }
     },
     "components": {
+      "minecraft:storage_container": {
+        "storage": 27
+      },
       "minecraft:destructible_by_mining": {
         "seconds_to_destroy": 1
       },

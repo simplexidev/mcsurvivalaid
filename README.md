@@ -35,6 +35,7 @@ Beta, feature-complete scaffold with placeholder art assets.
 ## Known limitations
 - Some quest metrics and structure-locator precision are best-effort due to API/event limits.
 - Full gameplay balancing for rewards is intentionally placeholder.
+- Vanilla-like chest lid/open animations require a custom block geometry setup (with chest bones/states); this pack currently uses `geometry.full_block`.
 
 ## Troubleshooting
 - Check malformed JSON in manifests/textures.
