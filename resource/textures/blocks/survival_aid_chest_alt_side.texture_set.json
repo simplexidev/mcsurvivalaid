@@ -1,0 +1,7 @@
+{
+    "format_version": "1.21.30",
+    "minecraft:texture_set": {
+        "color": "survival_aid_chest_alt_side",
+        "metalness_emissive_roughness_subsurface": "survival_aid_chest_alt_side_mers"
+    }
+}

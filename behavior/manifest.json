@@ -1,58 +1,43 @@
 {
-  "format_version": 2,
-  "header": {
-    "name": "Survival Aid Behavior Pack",
-    "description": "Behavior Pack for the Add-On 'Survival Aid' by SimplexiDev.",
-    "uuid": "015f4d48-9302-4958-931f-1fff3c3d98ee",
-    "version": [
-      0,
-      1,
-      0
-    ],
-    "min_engine_version": [
-      1,
-      26,
-      20
-    ]
-  },
-  "modules": [
-    {
-      "type": "data",
-      "uuid": "099dc38a-3309-4133-8121-cd7c152bad60",
-      "version": [
-        0,
-        1,
-        0
-      ]
-    },
-    {
-      "type": "script",
-      "language": "javascript",
-      "uuid": "a69cee0f-f85c-48f5-8176-a608813cdb0b",
-      "entry": "scripts/main.js",
-      "version": [
-        0,
-        1,
-        0
-      ]
-    }
-  ],
-  "dependencies": [
-    {
-      "module_name": "@minecraft/server",
-      "version": "2.6.0"
-    },
-    {
-      "module_name": "@minecraft/server-ui",
-      "version": "2.0.0"
-    },
-    {
-      "uuid": "4949491a-12af-4464-b99d-5d3ce10fef85",
-      "version": [
-        0,
-        1,
-        0
-      ]
-    }
-  ]
+	"format_version": 2,
+	"header": {
+		"name": "Survival Aid Behavior Pack",
+		"description": "Behavior Pack for the Add-On 'Survival Aid' by SimplexiDev.",
+		"uuid": "015f4d48-9302-4958-931f-1fff3c3d98ee",
+		"version": [0, 1, 0],
+		"min_engine_version": [1, 26, 20]
+	},
+	"modules": [
+		{
+			"type": "data",
+			"uuid": "099dc38a-3309-4133-8121-cd7c152bad60",
+			"version": [0, 1, 0]
+		},
+		{
+			"type": "script",
+			"language": "javascript",
+			"uuid": "a69cee0f-f85c-48f5-8176-a608813cdb0b",
+			"entry": "scripts/main.js",
+			"version": [0, 1, 0]
+		}
+	],
+	"dependencies": [
+		{
+			"module_name": "@minecraft/server",
+			"version": "2.6.0"
+		},
+		{
+			"module_name": "@minecraft/server-ui",
+			"version": "2.0.0"
+		},
+		{
+			"uuid": "4949491a-12af-4464-b99d-5d3ce10fef85",
+			"version": [0, 1, 0]
+		}
+	],
+	"metadata": {
+		"generated_with": {
+			"blockbench_item_wizard": ["1.2.4"]
+		}
+	}
 }

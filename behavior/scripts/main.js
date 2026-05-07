@@ -12,15 +12,18 @@ import { tickTravelTracking } from "./quests/travelTracker.js";
 import { tickRewardService } from "./rewards/rewardService.js";
 import { ensureWorldStateInitialized } from "./state/worldState.js";
 
-world.beforeEvents.worldInitialize.subscribe((event) => {
-  ensureWorldStateInitialized();
+system.beforeEvents.startup.subscribe((event) => {
   registerSurvivalChestComponent(event);
   registerBookOfSurvivalComponent(event);
 });
 
 world.afterEvents.playerSpawn.subscribe((event) => {
   if (event.initialSpawn) {
-    system.run(() => handleInitialSpawn(event.player));
+    system.run(() => {
+      ensureWorldStateInitialized();
+      handleInitialSpawn(event.player);
+    }
+    );
   }
 });
 
@@ -44,7 +47,7 @@ console.warn(`${ADDON.name} loaded.`);
 function runCompatibilityProbe() {
   const checks = [
     ["afterEvents.playerSpawn", typeof world.afterEvents?.playerSpawn?.subscribe === "function"],
-    ["beforeEvents.worldInitialize", typeof world.beforeEvents?.worldInitialize?.subscribe === "function"],
+    ["beforeEvents.startup", typeof system.beforeEvents?.startup?.subscribe === "function"],
     ["player.onScreenDisplay.setActionBar", typeof world.getAllPlayers !== "undefined"],
   ];
   const failed = checks.filter(([, ok]) => !ok).map(([name]) => name);
