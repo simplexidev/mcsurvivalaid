@@ -8,12 +8,19 @@ import { setInitialClass } from "../classes/classService.js";
 export async function handleInitialSpawn(player) {
   const state = getPlayerState(player);
   if (state.hasSeenInitialPrompt) return;
+
   const enableForm = new MessageFormData().title("Survival Aid").body("Enable Survival Aid rewards and utilities?").button1("Enable").button2("Disable");
   const enableResult = await enableForm.show(player);
   if (enableResult.canceled) return;
+
   if (enableResult.selection !== 0) {
-    state.hasSeenInitialPrompt = true; state.enabled = false; setPlayerState(player, state); return;
+    state.hasSeenInitialPrompt = true;
+    state.enabled = false;
+    setPlayerState(player, state);
+    player.sendMessage("Survival Aid disabled for your player profile.");
+    return;
   }
+
   await showClassSelection(player);
 }
 
@@ -23,6 +30,7 @@ async function showClassSelection(player) {
   for (const c of classes) form.button(`${c.name}\n${c.description}`);
   const result = await form.show(player);
   if (result.canceled || result.selection === undefined) return;
+
   const selectedClass = classes[result.selection];
   setInitialClass(player, selectedClass.id);
   giveStarterItems(player);
@@ -32,6 +40,20 @@ async function showClassSelection(player) {
 export function giveStarterItems(player) {
   const inventory = player.getComponent("minecraft:inventory")?.container;
   if (!inventory) return;
-  inventory.addItem(new ItemStack(ADDON.blocks.survivalChest, 1));
-  inventory.addItem(new ItemStack(ADDON.items.bookOfSurvival, 1));
+  ensureOneItem(inventory, ADDON.blocks.survivalChest);
+  ensureOneItem(inventory, ADDON.items.bookOfSurvival);
+}
+
+function ensureOneItem(container, itemId) {
+  if (countItem(container, itemId) > 0) return;
+  container.addItem(new ItemStack(itemId, 1));
+}
+
+function countItem(container, itemId) {
+  let total = 0;
+  for (let i = 0; i < container.size; i++) {
+    const slot = container.getItem(i);
+    if (slot?.typeId === itemId) total += slot.amount;
+  }
+  return total;
 }
