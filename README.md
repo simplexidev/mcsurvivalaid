@@ -6,6 +6,7 @@ Beta, feature-complete scaffold with placeholder art assets.
 
 ## Features
 - Survival Chest (`simplexidev:survival_aid_chest`) reward terminal.
+- Survival Chest interaction is reward-dispenser style (claims currently available rewards to the player), not a persistent inventory container.
 - Book of Survival (`simplexidev:book_of_survival`) UI hub.
 - First-spawn enable + class select flow.
 - Per-player dynamic-property state, class tracking, HUD, quests/rewards scaffolding.
@@ -35,7 +36,7 @@ Beta, feature-complete scaffold with placeholder art assets.
 ## Known limitations
 - Some quest metrics and structure-locator precision are best-effort due to API/event limits.
 - Full gameplay balancing for rewards is intentionally placeholder.
-- Vanilla-like chest lid/open animations require a custom block geometry setup (with chest bones/states); this pack currently uses `geometry.full_block`.
+- Vanilla-like chest lid/open animations still require custom block geometry + bones; this pack currently ships state hooks only.
 
 ## Troubleshooting
 - Check malformed JSON in manifests/textures.
