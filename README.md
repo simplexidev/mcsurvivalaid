@@ -5,7 +5,7 @@ Bedrock Edition add-on by SimplexiDev. **Bedrock-only** (not Java mods).
 Beta, feature-complete scaffold with placeholder art assets.
 
 ## Features
-- Survival Chest (`simplexidev:survival_chest`) reward terminal.
+- Survival Chest (`simplexidev:survival_aid_chest`) reward terminal.
 - Book of Survival (`simplexidev:book_of_survival`) UI hub.
 - First-spawn enable + class select flow.
 - Per-player dynamic-property state, class tracking, HUD, quests/rewards scaffolding.
@@ -23,13 +23,14 @@ Beta, feature-complete scaffold with placeholder art assets.
 3. Activate both packs on a test world.
 4. Ensure Content Log is visible for debugging.
 
-## Placeholder assets
-- Binary PNG assets are intentionally omitted in this branch/PR workflow.
-- Text placeholder markers are included:
-  - `resource/textures/blocks/survival_chest.placeholder.txt`
-  - `resource/textures/blocks/survival_chest_ready.placeholder.txt`
-  - `resource/textures/items/book_of_survival.placeholder.txt`
-- Replace these with real PNG files before in-game packaging.
+## Assets in this repository
+- The resource pack already includes item/block texture source files:
+  - `resource/textures/items/book_of_survival.png`
+  - `resource/textures/blocks/survival_aid_chest_top.png`
+  - `resource/textures/blocks/survival_aid_chest_side.png`
+  - `resource/textures/blocks/survival_aid_chest_front.png`
+- PBR companion maps (`*_mers.tga`) and `.texture_set.json` files are included for these textures.
+- No additional "compiled texture" outputs are required in-repo for Bedrock development pack loading.
 
 ## Known limitations
 - Some quest metrics and structure-locator precision are best-effort due to API/event limits.
@@ -46,7 +47,7 @@ See `.codex/current-task-status.md` for a full, tracked feature checklist.
 
 
 ## Packaging (optional)
-1. Replace placeholder texture marker files with real PNG assets.
-2. Zip Behavior Pack and Resource Pack separately (or create `.mcpack` files).
+1. Zip Behavior Pack and Resource Pack separately (or create `.mcpack` files).
+2. (Optional) Add custom geometry/animation assets if you move beyond `geometry.full_block`.
 3. Ensure BP manifest dependency UUID matches RP header UUID.
 4. Import both packs into Bedrock and enable in a test world.
