@@ -1,7 +1,7 @@
 import { world, system } from "@minecraft/server";
 
 import { ADDON } from "./constants.js";
-import { registerSurvivalChestComponent } from "./blocks/survivalChest.js";
+import { registerSurvivalChestComponent, syncChestVisualForPlayer } from "./blocks/survivalChest.js";
 import { registerBookOfSurvivalComponent } from "./items/bookOfSurvival.js";
 import { handleInitialSpawn } from "./ui/firstSpawnForms.js";
 import { updateHudForAllPlayers } from "./ui/bookOfSurvivalMenu.js";
@@ -35,6 +35,7 @@ system.runInterval(() => {
   tickRewardService();
   tickTravelTracking();
   updateHudForAllPlayers();
+  for (const p of world.getPlayers()) syncChestVisualForPlayer(p);
 }, 20);
 
 console.warn(`${ADDON.name} loaded.`);
