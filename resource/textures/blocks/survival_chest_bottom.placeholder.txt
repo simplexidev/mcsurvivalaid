@@ -1,1 +1,0 @@
-Create `survival_chest_bottom.png` here.

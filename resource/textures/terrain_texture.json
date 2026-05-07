@@ -2,18 +2,18 @@
   "resource_pack_name": "Survival Aid",
   "texture_name": "atlas.terrain",
   "texture_data": {
-    "survival_chest": {
+    "survival_aid_chest": {
       "textures": [
-        "textures/blocks/survival_chest_top",
-        "textures/blocks/survival_chest_side",
-        "textures/blocks/survival_chest_bottom"
+        "textures/blocks/survival_aid_chest_top",
+        "textures/blocks/survival_aid_chest_side",
+        "textures/blocks/survival_aid_chest_bottom"
       ]
     },
-    "survival_chest_ready": {
+    "survival_aid_chest_alt": {
       "textures": [
-        "textures/blocks/survival_chest_ready_top",
-        "textures/blocks/survival_chest_ready_side",
-        "textures/blocks/survival_chest_ready_bottom"
+        "textures/blocks/survival_aid_chest_alt_top",
+        "textures/blocks/survival_aid_chest_alt_side",
+        "textures/blocks/survival_aid_chest_alt_bottom"
       ]
     }
   }

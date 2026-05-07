@@ -2,7 +2,7 @@
   "format_version": "1.21.20",
   "minecraft:block": {
     "description": {
-      "identifier": "simplexidev:survival_chest",
+      "identifier": "simplexidev:survival_aid_chest",
       "menu_category": {
         "category": "items"
       },
@@ -12,7 +12,7 @@
     },
     "components": {
       "minecraft:destructible_by_mining": {
-        "seconds_to_destroy": 2.5
+        "seconds_to_destroy": 1
       },
       "minecraft:destructible_by_explosion": {
         "explosion_resistance": 15
@@ -20,12 +20,12 @@
       "minecraft:geometry": "geometry.full_block",
       "minecraft:material_instances": {
         "*": {
-          "texture": "survival_chest",
+          "texture": "survival_aid_chest",
           "render_method": "opaque"
         }
       },
       "minecraft:custom_components": [
-        "simplexidev:survival_chest_component"
+        "simplexidev:survival_aid_chest_component"
       ]
     },
     "permutations": [
@@ -34,7 +34,7 @@
         "components": {
           "minecraft:material_instances": {
             "*": {
-              "texture": "survival_chest_ready",
+              "texture": "survival_aid_chest_alt",
               "render_method": "opaque"
             }
           }

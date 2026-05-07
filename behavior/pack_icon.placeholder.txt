@@ -1,1 +1,0 @@
-Optional pack icon omitted in git (binary-free workflow).
