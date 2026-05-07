@@ -45,5 +45,7 @@ export function collectReadyItemRequests(state) {
       req.claimed = true;
     }
   }
+  // prune claimed requests older than ~1 in-game day to limit growth
+  state.requests.active = state.requests.active.filter(r => !r.claimed || (system.currentTick - r.readyAtTick) < 24000);
   return ready;
 }

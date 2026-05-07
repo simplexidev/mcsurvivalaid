@@ -30,10 +30,16 @@ export function teleportToRespawn(player) {
   const state = getPlayerState(player);
   if (!state.settings.allowTeleportToRespawn) return player.sendMessage("Teleport to Respawn is disabled.");
   if (!canUseCooldown(player, "respawnTeleportReadyTick")) return;
-  const spawn = player.getSpawnPoint?.() ?? null;
-  const target = spawn ?? { dimension: player.dimension.id, ...world.getDefaultSpawnLocation() };
-  const dimension = target.dimension ? world.getDimension(target.dimension) : player.dimension;
-  player.teleport({ x: target.x + 0.5, y: target.y + 1, z: target.z + 0.5 }, { dimension });
+  try {
+    const spawn = player.getSpawnPoint?.() ?? null;
+    const target = spawn ?? { dimension: player.dimension.id, ...world.getDefaultSpawnLocation() };
+    const dimension = target.dimension ? world.getDimension(target.dimension) : player.dimension;
+    player.teleport({ x: target.x + 0.5, y: target.y + 1, z: target.z + 0.5 }, { dimension });
+    player.sendMessage("Teleported to respawn.");
+  } catch (e) {
+    player.sendMessage("Teleport to respawn failed.");
+    console.warn(`Survival Aid teleportToRespawn failed: ${e}`);
+  }
 }
 
 export function teleportToLastDeath(player) {
@@ -42,6 +48,12 @@ export function teleportToLastDeath(player) {
   if (!canUseCooldown(player, "deathTeleportReadyTick")) return;
   const lastDeath = state.deaths.lastDeathLocation;
   if (!lastDeath) return player.sendMessage("No last death location has been recorded.");
-  const dimension = world.getDimension(lastDeath.dimension);
-  player.teleport({ x: lastDeath.x + 0.5, y: lastDeath.y + 2, z: lastDeath.z + 0.5 }, { dimension });
+  try {
+    const dimension = world.getDimension(lastDeath.dimension);
+    player.teleport({ x: lastDeath.x + 0.5, y: lastDeath.y + 2, z: lastDeath.z + 0.5 }, { dimension });
+    player.sendMessage(`Teleported to last death (${lastDeath.x}, ${lastDeath.y}, ${lastDeath.z}).`);
+  } catch (e) {
+    player.sendMessage("Teleport to last death failed. Dimension/location unavailable.");
+    console.warn(`Survival Aid teleportToLastDeath failed: ${e}`);
+  }
 }
