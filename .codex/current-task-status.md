@@ -368,11 +368,11 @@ Legend:
 - [ ] Implement glide/elytra tier balancing pass for thresholds and rewards.
 
 ### X. Quest metric expansion (combat/equipment lifecycle)
-- [ ] Implement crafted weapon/armor metric collection (exact supported event path, category mapping).
-- [ ] Implement smelted weapon/armor metric collection (exact supported event path, category mapping).
-- [ ] Implement broken weapon/armor metric collection (durability break detection path).
-- [ ] Add 5-tier thresholds for each new combat/equipment metric.
-- [ ] Add reward hooks and anti-duplicate token rules for each new metric.
+- [x] Implement crafted weapon/armor metric collection (best-effort event path + gear category mapping).
+- [x] Implement smelted weapon/armor metric collection (best-effort event path + gear category mapping).
+- [x] Implement broken weapon/armor metric collection (best-effort inventory disappearance approximation).
+- [x] Add 5-tier thresholds for each new combat/equipment metric.
+- [x] Add reward hooks and anti-duplicate token rules for each new metric.
 
 ### Y. Structure locator fallback registry
 - [x] Add persistent world-level discovered-structure registry schema.

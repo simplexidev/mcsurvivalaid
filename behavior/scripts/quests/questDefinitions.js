@@ -23,7 +23,10 @@ export const QUESTS = {
     hostile_mobs_killed: [5, 20, 50, 100, 200],
     non_hostile_mobs_killed: [5, 20, 50, 100, 200],
     damage_taken: [100, 500, 1500, 4000, 8000],
-    damage_dealt: [100, 500, 1500, 4000, 8000]
+    damage_dealt: [100, 500, 1500, 4000, 8000],
+    gear_crafted: [1, 5, 15, 30, 60],
+    gear_smelted: [1, 5, 15, 30, 60],
+    gear_broken: [1, 5, 15, 30, 60]
   }
 };
 
