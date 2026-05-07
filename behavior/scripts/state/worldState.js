@@ -1,5 +1,6 @@
 import { world, system } from "@minecraft/server";
 import { STORAGE_KEYS } from "./storageKeys.js";
+import { logger } from "../logging/logger.js";
 
 const WORLD_STATE_VERSION = 2;
 
@@ -15,11 +16,12 @@ export function createDefaultWorldState() {
 
 export function getWorldState() {
   const raw = world.getDynamicProperty(STORAGE_KEYS.worldState);
-  if (typeof raw !== "string" || raw.length === 0) return createDefaultWorldState();
+  if (typeof raw !== "string" || raw.length === 0) { logger.info("worldState", "No world state found; creating default state"); return createDefaultWorldState(); }
   try {
     const parsed = JSON.parse(raw);
     return migrateWorldState({ ...createDefaultWorldState(), ...parsed, knownStructures: { ...(parsed.knownStructures ?? {}) } });
-  } catch {
+  } catch (error) {
+    logger.error("worldState", "Failed to parse world state; creating defaults", { error: String(error) });
     return createDefaultWorldState();
   }
 }
@@ -27,6 +29,7 @@ export function getWorldState() {
 export function ensureWorldStateInitialized() {
   const current = getWorldState();
   setWorldState(current);
+  logger.info("worldState", "World state initialized", { stateVersion: current.stateVersion });
   return current;
 }
 
@@ -70,6 +73,7 @@ export function registerKnownStructure(type, dimension, x, y, z) {
   s.knownStructures[type].push({ dimension, x: Math.floor(x), y: Math.floor(y), z: Math.floor(z), tick: system.currentTick });
   s.knownStructures = normalizeKnownStructures(s.knownStructures);
   setWorldState(s);
+  logger.trace("worldState", "Registered known structure", { type, dimension, x: Math.floor(x), y: Math.floor(y), z: Math.floor(z) });
 }
 
 export function findNearestKnownStructure(type, dimension, x, z) {

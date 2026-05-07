@@ -11,14 +11,17 @@ import { registerCombatQuestTracking } from "./quests/combatTracker.js";
 import { tickTravelTracking } from "./quests/travelTracker.js";
 import { tickRewardService } from "./rewards/rewardService.js";
 import { ensureWorldStateInitialized } from "./state/worldState.js";
+import { logger } from "./logging/logger.js";
 
 system.beforeEvents.startup.subscribe((event) => {
+  logger.info("main", "Startup event received; registering components", { tick: system.currentTick });
   registerSurvivalChestComponent(event);
   registerBookOfSurvivalComponent(event);
 });
 
 world.afterEvents.playerSpawn.subscribe((event) => {
   const delay = event.initialSpawn ? 40 : 5;
+  logger.trace("main", "playerSpawn event", { playerId: event.player?.id, initialSpawn: event.initialSpawn, delay });
   if (event.initialSpawn) {
     system.runTimeout(() => {
       ensureWorldStateInitialized();
@@ -28,6 +31,7 @@ world.afterEvents.playerSpawn.subscribe((event) => {
 });
 
 world.afterEvents.entityDie.subscribe((event) => {
+  logger.trace("main", "entityDie event", { deadType: event.deadEntity?.typeId, tick: system.currentTick });
   handlePlayerDeath(event);
 });
 
@@ -35,6 +39,7 @@ registerBlockQuestTracking();
 registerCombatQuestTracking();
 
 system.runInterval(() => {
+  logger.trace("main", "Tick interval start", { tick: system.currentTick, playerCount: world.getPlayers().length });
   tickRewardService();
   tickTravelTracking();
   updateHudForAllPlayers();
@@ -42,7 +47,7 @@ system.runInterval(() => {
 }, 20);
 
 runCompatibilityProbe();
-console.warn(`${ADDON.name} loaded.`);
+logger.info("main", `${ADDON.name} loaded.`, { logLevel: logger.getLogLevel() });
 
 function runCompatibilityProbe() {
   const checks = [
@@ -52,8 +57,8 @@ function runCompatibilityProbe() {
   ];
   const failed = checks.filter(([, ok]) => !ok).map(([name]) => name);
   if (failed.length > 0) {
-    console.warn(`Survival Aid compatibility probe failed: ${failed.join(", ")}`);
+    logger.warn("main", "Compatibility probe failed", { failed });
   } else {
-    console.warn("Survival Aid compatibility probe passed for required API surfaces.");
+    logger.info("main", "Compatibility probe passed for required API surfaces.");
   }
 }

@@ -1,10 +1,12 @@
 import { world, system } from "@minecraft/server";
 import { getPlayerState, setPlayerState } from "../state/playerState.js";
+import { logger } from "../logging/logger.js";
 import { getCurrentWorldDay } from "../rewards/rewardService.js";
 
 export function handlePlayerDeath(event) {
   const dead = event.deadEntity;
   if (!dead || dead.typeId !== "minecraft:player") return;
+  logger.info("teleportService", "Player death captured", { playerId: dead.id, dimension: dead.dimension.id });
   const state = getPlayerState(dead);
   const location = dead.location;
   state.deaths.lastDeathLocation = { dimension: dead.dimension.id, x: Math.floor(location.x), y: Math.floor(location.y), z: Math.floor(location.z), tick: system.currentTick, day: getCurrentWorldDay() };
@@ -20,6 +22,7 @@ function canUseCooldown(player, key) {
   if (system.currentTick < state.cooldowns[key]) {
     const remain = Math.ceil((state.cooldowns[key] - system.currentTick) / 20);
     player.sendMessage(`Teleport cooldown: ${remain}s remaining.`);
+    logger.trace("teleportService", "Teleport cooldown active", { playerId: player.id, key, remainingTicks: state.cooldowns[key] - system.currentTick });
     return false;
   }
   state.cooldowns[key] = system.currentTick + (state.settings.teleportCooldownSeconds * 20);
@@ -42,7 +45,7 @@ export function teleportToRespawn(player) {
     player.sendMessage("Teleported to respawn.");
   } catch (e) {
     player.sendMessage("Teleport to respawn failed.");
-    console.warn(`Survival Aid teleportToRespawn failed: ${e}`);
+    logger.error("teleportService", "teleportToRespawn failed", { playerId: player.id, error: String(e) });
   }
 }
 
@@ -61,7 +64,7 @@ export function teleportToLastDeath(player) {
     player.sendMessage(`Teleported to last death (${lastDeath.x}, ${lastDeath.y}, ${lastDeath.z}).`);
   } catch (e) {
     player.sendMessage("Teleport to last death failed. Dimension/location unavailable.");
-    console.warn(`Survival Aid teleportToLastDeath failed: ${e}`);
+    logger.error("teleportService", "teleportToLastDeath failed", { playerId: player.id, error: String(e) });
   }
 }
 

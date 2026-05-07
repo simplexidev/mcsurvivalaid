@@ -4,11 +4,13 @@ import { getEarnedClassRewardDays } from "./rewardSchedule.js";
 import { getPlayerState, setPlayerState } from "../state/playerState.js";
 import { collectReadyItemRequests } from "../items/requestService.js";
 import { maybePromptClassChange } from "../classes/classService.js";
+import { logger } from "../logging/logger.js";
 
 export function tickRewardService() {
+  logger.trace("rewardService", "Tick reward service", { tick: system.currentTick, players: world.getPlayers().length });
   for (const player of world.getPlayers()) {
     const state = getPlayerState(player);
-    if (!state.enabled || !state.classTrack.currentClass) continue;
+    if (!state.enabled || !state.classTrack.currentClass) { logger.trace("rewardService", "Skipping reward tick for player", { playerId: player.id, enabled: state.enabled, currentClass: state.classTrack.currentClass }); continue; }
     const worldDay = getCurrentWorldDay();
     maybePromptClassChange(player, worldDay);
     const classTrackDays = Math.max(0, worldDay - state.classTrack.classTrackStartDay);
@@ -16,6 +18,7 @@ export function tickRewardService() {
     if (earnedDays.length > 0) {
       state.classTrack.pendingClassRewardDays.push(...earnedDays);
       setPlayerState(player, state);
+      logger.info("rewardService", "Queued earned class rewards", { playerId: player.id, earnedDays });
     }
   }
 }
@@ -27,7 +30,7 @@ export function hasPendingRewards(player) {
 
 export function claimPendingRewards(player) {
   const state = getPlayerState(player);
-  if (!state.enabled) return player.sendMessage("Survival Aid rewards are not enabled.");
+  if (!state.enabled) { logger.warn("rewardService", "Claim attempt while rewards disabled", { playerId: player.id }); return player.sendMessage("Survival Aid rewards are not enabled."); }
   let grantedAny = false;
 
   if (state.classTrack.currentClass) {
@@ -73,6 +76,7 @@ export function claimPendingRewards(player) {
   }
 
   setPlayerState(player, state);
+  logger.info("rewardService", "Processed reward claim", { playerId: player.id, grantedAny, pendingClass: state.classTrack.pendingClassRewardDays.length, pendingQuest: state.quests.pendingQuestRewards.length });
   player.sendMessage(grantedAny ? "Claimed Survival Aid rewards." : "No Survival Aid rewards are ready.");
 }
 
@@ -86,7 +90,7 @@ function grantRewardBundle(player, rewards) {
     if (failure) { remaining.push(reward); continue; }
     const ok = giveOrDrop(player, reward.itemId, reward.amount);
     if (!ok) {
-      console.warn(`Survival Aid failed reward grant for ${reward.itemId} x${reward.amount}`);
+      logger.warn("rewardService", "Failed reward grant", { playerId: player.id, itemId: reward.itemId, amount: reward.amount });
       remaining.push(reward);
       failure = true;
     }
@@ -107,7 +111,7 @@ function giveOrDrop(player, itemId, amount) {
     player.dimension.spawnItem(stack, player.location);
     return true;
   } catch (e) {
-    console.warn(`Survival Aid giveOrDrop error: ${e}`);
+    logger.error("rewardService", "giveOrDrop error", { playerId: player.id, itemId, amount, error: String(e) });
     return false;
   }
 }

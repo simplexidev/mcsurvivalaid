@@ -1,14 +1,22 @@
 import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
 import { getPlayerState, setPlayerState } from "../state/playerState.js";
 import { giveStarterItems } from "./firstSpawnForms.js";
+import { logger } from "../logging/logger.js";
+
+const LOG_LEVELS = ["trace", "info", "warn", "error"];
 
 export async function showSettingsMenu(player) {
-  const root = new ActionFormData().title("Survival Aid Settings").button("Gameplay Settings").button("Recover Starter Items");
+  const root = new ActionFormData().title("Survival Aid Settings").button("Gameplay Settings").button("Recover Starter Items").button(`Content Log Level: ${logger.getLogLevel()}`);
   const rootResult = await root.show(player);
-  if (rootResult.canceled || rootResult.selection === undefined) return;
+  if (rootResult.canceled || rootResult.selection === undefined) { logger.trace("settingsMenu", "Settings root canceled", { playerId: player.id }); return; }
   if (rootResult.selection === 1) {
     giveStarterItems(player);
     player.sendMessage("Starter items re-issued (if inventory has space).");
+    logger.info("settingsMenu", "Starter items re-issued from settings menu", { playerId: player.id });
+    return;
+  }
+  if (rootResult.selection === 2) {
+    await showLoggingLevelMenu(player);
     return;
   }
   const state = getPlayerState(player);
@@ -22,9 +30,22 @@ export async function showSettingsMenu(player) {
     .toggle("Allow Teleport to Last Death", state.settings.allowTeleportToDeath)
     .slider("Teleport Cooldown (sec)", 10, 600, 10, state.settings.teleportCooldownSeconds);
   const result = await form.show(player);
-  if (result.canceled || !result.formValues) return;
+  if (result.canceled || !result.formValues) { logger.trace("settingsMenu", "Gameplay settings canceled", { playerId: player.id }); return; }
   const [showHud,showDaysSurvived,showDaysUntilReward,showRewardReady,chestChangesTexture,allowTeleportToRespawn,allowTeleportToDeath,teleportCooldownSeconds] = result.formValues;
   Object.assign(state.settings,{showHud,showDaysSurvived,showDaysUntilReward,showRewardReady,chestChangesTexture,allowTeleportToRespawn,allowTeleportToDeath,teleportCooldownSeconds:Math.floor(teleportCooldownSeconds)});
   setPlayerState(player,state);
+  logger.info("settingsMenu", "Player settings updated", { playerId: player.id, settings: state.settings });
   player.sendMessage("Survival Aid settings updated.");
+}
+
+async function showLoggingLevelMenu(player) {
+  const current = logger.getLogLevel();
+  const form = new ActionFormData().title("Content Log Level").body("Choose how verbose the Survival Aid content log should be.");
+  for (const level of LOG_LEVELS) form.button(level === current ? `${level} (current)` : level);
+  const result = await form.show(player);
+  if (result.canceled || result.selection === undefined) return;
+  const selected = LOG_LEVELS[result.selection];
+  if (!selected || !logger.setLogLevel(selected)) return;
+  logger.info("settingsMenu", "Log level updated", { playerId: player.id, selected });
+  player.sendMessage(`Survival Aid content log level set to ${selected}.`);
 }

@@ -2,6 +2,7 @@ import { ActionFormData, MessageFormData } from "@minecraft/server-ui";
 import { getCurrentWorldDay } from "../rewards/rewardService.js";
 import { getPlayerState, setPlayerState } from "../state/playerState.js";
 import { getClassList } from "./classDefinitions.js";
+import { logger } from "../logging/logger.js";
 
 const activePrompts = new Set();
 
@@ -18,6 +19,7 @@ export function setInitialClass(player, classId) {
   state.classTrack.nextClassChangePromptDay = worldDay + 20;
   state.classTrack.tier5ClaimedCurrent = false;
   setPlayerState(player, state);
+  logger.info("classService", "Initial class set", { playerId: player.id, classId, worldDay });
 }
 
 export function changeClass(player, newClassId) {
@@ -33,25 +35,31 @@ export function changeClass(player, newClassId) {
   state.classTrack.nextClassChangePromptDay = worldDay + 10;
   state.classTrack.tier5ClaimedCurrent = false;
   setPlayerState(player, state);
+  logger.info("classService", "Class changed", { playerId: player.id, oldClass, newClassId, worldDay });
 }
 
 export async function maybePromptClassChange(player, worldDay) {
-  if (activePrompts.has(player.id)) return;
+  if (activePrompts.has(player.id)) { logger.trace("classService", "Class prompt already active", { playerId: player.id }); return; }
   const state = getPlayerState(player);
   const daysSurvived = Math.max(0, worldDay - state.classTrack.lastDeathDay);
-  if (daysSurvived < 20 || worldDay < state.classTrack.nextClassChangePromptDay) return;
+  if (daysSurvived < 20 || worldDay < state.classTrack.nextClassChangePromptDay) { logger.trace("classService", "Class change not yet available", { playerId: player.id, daysSurvived, worldDay, nextPromptDay: state.classTrack.nextClassChangePromptDay }); return; }
   activePrompts.add(player.id);
   const confirm = await new MessageFormData().title("Class Change Available").body("You can change class now. Change class?").button1("Change").button2("Keep Current").show(player);
   if (confirm.canceled || confirm.selection !== 0) {
     state.classTrack.nextClassChangePromptDay = worldDay + 10;
-  state.classTrack.tier5ClaimedCurrent = false; setPlayerState(player, state); activePrompts.delete(player.id); return;
+    state.classTrack.tier5ClaimedCurrent = false;
+    setPlayerState(player, state);
+    activePrompts.delete(player.id);
+    logger.info("classService", "Class change declined", { playerId: player.id, nextPromptDay: state.classTrack.nextClassChangePromptDay });
+    return;
   }
   const available = getClassList().filter(c => c.id !== state.classTrack.currentClass && !state.classTrack.completedClasses.includes(c.id));
-  if (available.length === 0) { player.sendMessage("All classes completed or unavailable."); state.classTrack.nextClassChangePromptDay = worldDay + 10; setPlayerState(player,state); activePrompts.delete(player.id); return; }
+  if (available.length === 0) { player.sendMessage("All classes completed or unavailable."); state.classTrack.nextClassChangePromptDay = worldDay + 10; setPlayerState(player,state); activePrompts.delete(player.id); logger.warn("classService", "No available classes", { playerId: player.id }); return; }
   const form = new ActionFormData().title("Select New Class").body("Choose your new class track.");
-  for (const c of available) form.button(`${c.name}\n${c.description}`);
+  for (const c of available) form.button(`${c.name}
+${c.description}`);
   const result = await form.show(player);
-  if (result.canceled || result.selection === undefined) { state.classTrack.nextClassChangePromptDay = worldDay + 10; setPlayerState(player, state); activePrompts.delete(player.id); return; }
+  if (result.canceled || result.selection === undefined) { state.classTrack.nextClassChangePromptDay = worldDay + 10; setPlayerState(player, state); activePrompts.delete(player.id); logger.info("classService", "Class selection canceled", { playerId: player.id }); return; }
   changeClass(player, available[result.selection].id);
   player.sendMessage(`Class changed to ${available[result.selection].name}.`);
   activePrompts.delete(player.id);
