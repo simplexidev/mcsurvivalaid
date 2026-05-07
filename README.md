@@ -42,4 +42,4 @@ Beta, feature-complete scaffold with placeholder art assets.
 
 
 ## Implementation checklist
-See `docs/IMPLEMENTATION_CHECKLIST.md` for a full, tracked feature checklist.
+See `.codex/current-task-status.md` for a full, tracked feature checklist.

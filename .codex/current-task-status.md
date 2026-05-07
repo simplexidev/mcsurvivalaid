@@ -359,16 +359,56 @@ Legend:
 - [ ] Multiplayer chest ownership check with 2+ players.
 - [ ] Multiplayer reward isolation checks.
 
-## V. Remaining code-complete items (to mark PR truly “done”)
-- [x] Boat travel quest metric (best-effort).
-- [x] Glide/elytra travel quest metric (best-effort).
-- [ ] Crafted gear quest metric (or explicit documented non-support).
-- [ ] Smelted gear quest metric (or explicit documented non-support).
-- [ ] Broken gear quest metric (or explicit documented non-support).
-- [ ] Structure registry fallback when locate command is unavailable.
-- [x] Class completion rule tightened to final intended semantics (Tier-5/day-20 claimed gate).
-- [ ] Optional: robust safe-teleport landing resolver.
+## V. Remaining code-complete items (must all be implemented)
 
+### V1. Quest metric expansion (travel)
+- [ ] Implement boat travel metric source hardening (dimension changes, dismount edge cases, speed spike guard tuning).
+- [ ] Implement boat travel tier balancing pass for thresholds and rewards.
+- [ ] Implement glide/elytra metric source hardening (launch/landing edge cases, teleport false positives).
+- [ ] Implement glide/elytra tier balancing pass for thresholds and rewards.
+
+### V2. Quest metric expansion (combat/equipment lifecycle)
+- [ ] Implement crafted weapon/armor metric collection (exact supported event path, category mapping).
+- [ ] Implement smelted weapon/armor metric collection (exact supported event path, category mapping).
+- [ ] Implement broken weapon/armor metric collection (durability break detection path).
+- [ ] Add 5-tier thresholds for each new combat/equipment metric.
+- [ ] Add reward hooks and anti-duplicate token rules for each new metric.
+
+### V3. Structure locator fallback registry
+- [ ] Add persistent world-level discovered-structure registry schema.
+- [ ] Add script API for registering discovered structures by type and dimension.
+- [ ] Add locator fallback resolution to nearest known structure when `locate` command unavailable.
+- [ ] Add user-facing messaging path for “no known structure yet” fallback state.
+- [ ] Add registry cleanup/migration hooks in world state versioning.
+
+### V4. Teleport safety hardening
+- [ ] Implement safe-landing resolver that probes vertical space for non-suffocating target.
+- [ ] Add fallback to nearby safe offsets when direct target is blocked.
+- [ ] Add short post-teleport safety mitigation (effect and/or reposition retry) where API allows.
+- [ ] Add failure path that preserves cooldown fairness and gives actionable user message.
+
+### V5. Class progression correctness hardening
+- [ ] Enforce class completion rule through explicit Tier-5 claim marker persisted independently from claimed-day list.
+- [ ] Add migration for existing player states to new explicit completion marker.
+- [ ] Block class switching for classes not meeting completion rule in all prompt flows.
+- [ ] Add regression checks for death/reset interactions with completion markers.
+
+### V6. Reward-claim transaction robustness
+- [ ] Add per-reward grant result capture (inventory add/drop status).
+- [ ] Only mark reward token/day claimed after confirmed grant/drop success.
+- [ ] Add retry-safe handling for partial failures within multi-reward bundles.
+- [ ] Add defensive logging for failed grant/drop operations.
+
+### V7. Multiplayer ownership hardening
+- [ ] Add optional chest ownership token persisted separately from location for stronger anti-theft verification.
+- [ ] Prevent claims when owner token mismatch detected even at matching coordinates.
+- [ ] Add behavior for stale chest records (missing block / replaced block / dimension mismatch).
+- [ ] Add explicit user messaging for each ownership failure reason.
+
+### V8. Checklist/process completion requirements
+- [ ] As each V task is implemented, update this checklist in the same commit.
+- [ ] Keep V section fully granular until all items are `[x]`.
+- [ ] Do not convert V tasks to “documented non-support”; implement all requested items.
 ---
 
 ## Completion policy
