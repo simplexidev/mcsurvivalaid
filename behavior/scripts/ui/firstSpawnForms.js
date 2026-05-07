@@ -1,5 +1,5 @@
 import { ActionFormData, MessageFormData } from "@minecraft/server-ui";
-import { ItemStack } from "@minecraft/server";
+import { ItemStack, system } from "@minecraft/server";
 import { ADDON } from "../constants.js";
 import { getPlayerState, setPlayerState } from "../state/playerState.js";
 import { getClassList } from "../classes/classDefinitions.js";
@@ -65,19 +65,35 @@ ${c.description}`);
 }
 
 async function showRequiredMessageForm(player, form, flow) {
+  let attempts = 0;
   while (true) {
+    attempts++;
     const result = await form.show(player);
     if (!result.canceled && result.selection !== undefined) return result;
-    logger.warn("firstSpawn", "Required message form canceled; re-showing", { playerId: player.id, flow });
+    if (attempts <= 3 || attempts % 10 === 0) {
+      logger.warn("firstSpawn", "Required message form canceled; re-showing", { playerId: player.id, flow, attempts });
+    }
+    await waitTicks(10);
   }
 }
 
 async function showRequiredActionForm(player, form, flow) {
+  let attempts = 0;
   while (true) {
+    attempts++;
     const result = await form.show(player);
     if (!result.canceled && result.selection !== undefined) return result;
-    logger.warn("firstSpawn", "Required action form canceled; re-showing", { playerId: player.id, flow });
+    if (attempts <= 3 || attempts % 10 === 0) {
+      logger.warn("firstSpawn", "Required action form canceled; re-showing", { playerId: player.id, flow, attempts });
+    }
+    await waitTicks(10);
   }
+}
+
+function waitTicks(ticks) {
+  return new Promise((resolve) => {
+    system.runTimeout(resolve, ticks);
+  });
 }
 
 export function giveStarterItems(player) {
