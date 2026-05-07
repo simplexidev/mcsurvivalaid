@@ -22,6 +22,15 @@ export function tickTravelTracking() {
         addQuestProgress(player, "travel", "swim_distance", horizontalDistance);
       }
 
+      if (player.isGliding && horizontalDistance > 0.01 && horizontalDistance < 60) {
+        addQuestProgress(player, "travel", "glide_distance", horizontalDistance);
+      }
+
+      const riding = player.getComponent("minecraft:riding")?.entityRidingOn;
+      if (riding?.typeId === "minecraft:boat" && horizontalDistance > 0.01 && horizontalDistance < 30) {
+        addQuestProgress(player, "travel", "boat_distance", horizontalDistance);
+      }
+
       if (dy > 0.42 && dy < 3) {
         addQuestProgress(player, "travel", "jump_count", 1);
       }

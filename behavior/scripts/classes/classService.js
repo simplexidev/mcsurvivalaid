@@ -22,7 +22,8 @@ export function setInitialClass(player, classId) {
 export function changeClass(player, newClassId) {
   const state = getPlayerState(player);
   const oldClass = state.classTrack.currentClass;
-  if (oldClass && !state.classTrack.completedClasses.includes(oldClass)) state.classTrack.completedClasses.push(oldClass);
+  const reachedTier5 = state.classTrack.claimedClassRewardDays.includes(20);
+  if (oldClass && reachedTier5 && !state.classTrack.completedClasses.includes(oldClass)) state.classTrack.completedClasses.push(oldClass);
   const worldDay = getCurrentWorldDay();
   state.classTrack.currentClass = newClassId;
   state.classTrack.classTrackStartDay = worldDay;

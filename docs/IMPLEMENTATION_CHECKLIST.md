@@ -133,7 +133,7 @@ Legend:
 - [x] Excludes currently active class in switch list.
 - [x] Excludes completed classes in switch list.
 - [x] Prompt de-duping guard prevents overlap.
-- [~] “Completed class” rule aligned exactly to Tier-5 claimed semantics.
+- [x] “Completed class” rule aligned to Tier-5 claimed semantics (day 20 claimed required).
 
 ## I. Reward schedule and claiming
 ### I1. Schedule
@@ -223,8 +223,8 @@ Legend:
 - [x] Swim distance approximation.
 - [x] Jump count approximation.
 - [x] Fall distance approximation.
-- [ ] Boat-specific detection.
-- [ ] Elytra glide detection.
+- [x] Boat-specific detection (best-effort via riding component).
+- [x] Elytra glide detection (best-effort via `player.isGliding`).
 
 ### N3. Block metrics
 - [x] Block break event subscribed.
@@ -360,13 +360,13 @@ Legend:
 - [ ] Multiplayer reward isolation checks.
 
 ## V. Remaining code-complete items (to mark PR truly “done”)
-- [ ] Boat travel quest metric.
-- [ ] Glide/elytra travel quest metric.
+- [x] Boat travel quest metric (best-effort).
+- [x] Glide/elytra travel quest metric (best-effort).
 - [ ] Crafted gear quest metric (or explicit documented non-support).
 - [ ] Smelted gear quest metric (or explicit documented non-support).
 - [ ] Broken gear quest metric (or explicit documented non-support).
 - [ ] Structure registry fallback when locate command is unavailable.
-- [ ] Class completion rule tightened to final intended semantics.
+- [x] Class completion rule tightened to final intended semantics (Tier-5/day-20 claimed gate).
 - [ ] Optional: robust safe-teleport landing resolver.
 
 ---

@@ -3,7 +3,9 @@ export const QUESTS = {
     horizontal_distance: [250, 1000, 3000, 7000, 15000],
     swim_distance: [50, 250, 750, 1500, 3000],
     jump_count: [100, 500, 1500, 3000, 6000],
-    fall_distance: [30, 100, 250, 500, 1000]
+    fall_distance: [30, 100, 250, 500, 1000],
+    boat_distance: [100, 500, 1500, 3000, 6000],
+    glide_distance: [100, 500, 1500, 3000, 6000]
   },
   blocksBroken: {
     ground: [64, 256, 512, 1024, 2048],
