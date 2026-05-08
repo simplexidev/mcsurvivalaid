@@ -2,6 +2,26 @@ import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
 import { world } from "@minecraft/server";
 import { logger } from "../logging/logger.js";
 
+function getCommandRunner(target) {
+  if (typeof target?.runCommandAsync === "function") {
+    return (command) => target.runCommandAsync(command);
+  }
+  if (typeof target?.runCommand === "function") {
+    return (command) => target.runCommand(command);
+  }
+  throw new TypeError("No command runner available on target");
+}
+
+async function runCommand(target, command) {
+  const runner = getCommandRunner(target);
+  return await Promise.resolve(runner(command));
+}
+
+function playerSelector(player) {
+  const escapedName = String(player.name).replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+  return `@a[name=\"${escapedName}\",c=1]`;
+}
+
 export async function showDeveloperMenu(player) {
   const form = new ActionFormData()
     .title("Developer Tools")
@@ -45,7 +65,7 @@ async function showSkipDaysMenu(player) {
 
   try {
     const overworld = world.getDimension("minecraft:overworld");
-    await overworld.runCommandAsync(`time add ${ticks}`);
+    await runCommand(overworld, `time add ${ticks}`);
     player.sendMessage(`Developer: skipped ${days} in-game day(s).`);
     logger.info("developerMenu", "Developer skipped days", { playerId: player.id, days, ticks });
   } catch (error) {
@@ -60,7 +80,7 @@ async function setRespawnHere(player) {
   const z = Math.floor(player.location.z);
 
   try {
-    await player.runCommandAsync(`spawnpoint @s ${x} ${y} ${z}`);
+    await runCommand(player.dimension, `execute as ${playerSelector(player)} run spawnpoint @s ${x} ${y} ${z}`);
     player.sendMessage(`Developer: respawn point set to ${x}, ${y}, ${z}.`);
     logger.info("developerMenu", "Developer set respawn point", { playerId: player.id, dimension: player.dimension.id, x, y, z });
   } catch (error) {
@@ -71,7 +91,7 @@ async function setRespawnHere(player) {
 
 async function killPlayerInstantly(player) {
   try {
-    await player.runCommandAsync("kill @s");
+    await runCommand(player.dimension, `execute as ${playerSelector(player)} run kill @s`);
     logger.warn("developerMenu", "Developer used instant kill", { playerId: player.id, dimension: player.dimension.id });
   } catch (error) {
     player.sendMessage("Developer: failed to kill player.");
