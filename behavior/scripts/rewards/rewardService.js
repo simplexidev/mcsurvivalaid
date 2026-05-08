@@ -46,11 +46,12 @@ export function hasPendingRewards(player) {
   return state.classTrack.pendingClassRewardDays.length > 0 || state.quests.pendingQuestRewards.length > 0 || state.requests.active.some(r => !r.claimed && r.readyAtTick <= system.currentTick);
 }
 
-export function claimPendingRewards(player) {
+export function claimPendingRewards(player, options = {}) {
+  const { includeClassAndQuestRewards = true } = options;
   const state = getPlayerState(player);
   let grantedAny = false;
 
-  if (state.enabled && state.classTrack.currentClass) {
+  if (includeClassAndQuestRewards && state.enabled && state.classTrack.currentClass) {
     const keepPendingClass = [];
     for (const rewardDay of [...state.classTrack.pendingClassRewardDays]) {
       const key = String(rewardDay);
@@ -71,7 +72,7 @@ export function claimPendingRewards(player) {
   }
 
   const keepPendingQuests = [];
-  if (state.enabled) {
+  if (includeClassAndQuestRewards && state.enabled) {
     for (const quest of [...state.quests.pendingQuestRewards]) {
       const result = grantRewardBundle(player, quest.rewards);
       if (result.ok) {
@@ -95,7 +96,13 @@ export function claimPendingRewards(player) {
   }
 
   setPlayerState(player, state);
-  logger.info("rewardService", "Processed reward claim", { playerId: player.id, grantedAny, pendingClass: state.classTrack.pendingClassRewardDays.length, pendingQuest: state.quests.pendingQuestRewards.length });
+  logger.info("rewardService", "Processed reward claim", {
+    playerId: player.id,
+    grantedAny,
+    includeClassAndQuestRewards,
+    pendingClass: state.classTrack.pendingClassRewardDays.length,
+    pendingQuest: state.quests.pendingQuestRewards.length
+  });
   player.sendMessage(grantedAny ? "Claimed Survival Aid rewards." : "No Survival Aid rewards are ready.");
 }
 

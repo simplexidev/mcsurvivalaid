@@ -12,6 +12,9 @@
       }
     },
     "components": {
+      "minecraft:custom_components": [
+        "simplexidev:survival_aid_chest_component"
+      ],
       "minecraft:destructible_by_mining": {
         "seconds_to_destroy": 1
       },
@@ -20,20 +23,59 @@
       },
       "minecraft:geometry": "geometry.survival_aid_chest",
       "minecraft:material_instances": {
-        "*": {
-          "texture": "survival_aid_chest",
+        "north": {
+          "texture": "survival_aid_chest_front",
+          "render_method": "opaque"
+        },
+        "south": {
+          "texture": "survival_aid_chest_side",
+          "render_method": "opaque"
+        },
+        "east": {
+          "texture": "survival_aid_chest_side",
+          "render_method": "opaque"
+        },
+        "west": {
+          "texture": "survival_aid_chest_side",
+          "render_method": "opaque"
+        },
+        "up": {
+          "texture": "survival_aid_chest_top",
+          "render_method": "opaque"
+        },
+        "down": {
+          "texture": "survival_aid_chest_top",
           "render_method": "opaque"
         }
-      },
-      "simplexidev:survival_aid_chest_component": {}
+      }
     },
     "permutations": [
       {
         "condition": "q.block_state('simplexidev:has_reward') == true",
         "components": {
           "minecraft:material_instances": {
-            "*": {
-              "texture": "survival_aid_chest_alt",
+            "north": {
+              "texture": "survival_aid_chest_alt_front",
+              "render_method": "opaque"
+            },
+            "south": {
+              "texture": "survival_aid_chest_alt_side",
+              "render_method": "opaque"
+            },
+            "east": {
+              "texture": "survival_aid_chest_alt_side",
+              "render_method": "opaque"
+            },
+            "west": {
+              "texture": "survival_aid_chest_alt_side",
+              "render_method": "opaque"
+            },
+            "up": {
+              "texture": "survival_aid_chest_alt_top",
+              "render_method": "opaque"
+            },
+            "down": {
+              "texture": "survival_aid_chest_alt_top",
               "render_method": "opaque"
             }
           }
@@ -43,8 +85,28 @@
         "condition": "q.block_state('simplexidev:is_open') == true",
         "components": {
           "minecraft:material_instances": {
-            "*": {
-              "texture": "survival_aid_chest",
+            "north": {
+              "texture": "survival_aid_chest_front",
+              "render_method": "opaque"
+            },
+            "south": {
+              "texture": "survival_aid_chest_side",
+              "render_method": "opaque"
+            },
+            "east": {
+              "texture": "survival_aid_chest_side",
+              "render_method": "opaque"
+            },
+            "west": {
+              "texture": "survival_aid_chest_side",
+              "render_method": "opaque"
+            },
+            "up": {
+              "texture": "survival_aid_chest_top",
+              "render_method": "opaque"
+            },
+            "down": {
+              "texture": "survival_aid_chest_top",
               "render_method": "opaque"
             }
           }
