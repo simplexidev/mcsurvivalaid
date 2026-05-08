@@ -1,7 +1,7 @@
 import { world, system } from "@minecraft/server";
 
 import { ADDON } from "./constants.js";
-import { registerSurvivalChestComponent, syncChestVisualForPlayer } from "./blocks/survivalAidChest.js";
+import { handleSurvivalChestInteract, registerSurvivalChestComponent, syncChestVisualForPlayer } from "./blocks/survivalAidChest.js";
 import { registerBookOfSurvivalComponent } from "./items/bookOfSurvival.js";
 import { handleInitialSpawn } from "./ui/firstSpawnForms.js";
 import { updateHudForAllPlayers } from "./ui/bookOfSurvivalMenu.js";
@@ -33,6 +33,12 @@ world.afterEvents.playerSpawn.subscribe((event) => {
 world.afterEvents.entityDie.subscribe((event) => {
   logger.trace("main", "entityDie event", { deadType: event.deadEntity?.typeId, tick: system.currentTick });
   handlePlayerDeath(event);
+});
+
+world.beforeEvents.playerInteractWithBlock.subscribe((event) => {
+  if (event.block?.typeId !== ADDON.blocks.survivalChest) return;
+  if (!event.player) return;
+  handleSurvivalChestInteract(event.player, event.block);
 });
 
 registerBlockQuestTracking();

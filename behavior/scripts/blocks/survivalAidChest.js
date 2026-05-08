@@ -32,25 +32,7 @@ export function registerSurvivalChestComponent(event) {
     onPlayerInteract(args) {
       const player = args.player;
       if (!player) return;
-      const state = getPlayerState(player);
-      if (!state.chest.location) return;
-
-      const own = state.chest.location;
-      const b = args.block.location;
-
-      if (!own.ownerToken || own.ownerId !== player.id) {
-        player.sendMessage("Chest ownership validation failed (owner token mismatch).");
-        return;
-      }
-
-      if (own.dimension !== args.block.dimension.id || own.x !== b.x || own.y !== b.y || own.z !== b.z) {
-        player.sendMessage("This is not your registered Survival Chest.");
-        return;
-      }
-
-      pulseOpenState(args.block);
-      claimPendingRewards(player);
-      tryUpdateChestVisual(args.block, player);
+      handleSurvivalChestInteract(player, args.block);
     },
 
     onPlayerDestroy(args) {
@@ -66,6 +48,22 @@ export function registerSurvivalChestComponent(event) {
       }
     }
   });
+}
+
+export function handleSurvivalChestInteract(player, block) {
+  const state = getPlayerState(player);
+  if (!state.chest.location) return;
+
+  const own = state.chest.location;
+  const b = block.location;
+
+  if (own.dimension !== block.dimension.id || own.x !== b.x || own.y !== b.y || own.z !== b.z) {
+    return;
+  }
+
+  pulseOpenState(block);
+  claimPendingRewards(player);
+  tryUpdateChestVisual(block, player);
 }
 
 export function syncChestVisualForPlayer(player) {
