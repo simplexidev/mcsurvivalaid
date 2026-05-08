@@ -2,11 +2,13 @@ import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
 import { getPlayerState, setPlayerState } from "../state/playerState.js";
 import { giveStarterItems } from "./firstSpawnForms.js";
 import { logger } from "../logging/logger.js";
+import { showDeveloperMenu } from "./developerMenu.js";
 
 const LOG_LEVELS = ["trace", "info", "warn", "error"];
 
 export async function showSettingsMenu(player) {
-  const root = new ActionFormData().title("Survival Aid Settings").button("Gameplay Settings").button("Recover Starter Items").button(`Content Log Level: ${logger.getLogLevel()}`);
+  const root = new ActionFormData().title("Survival Aid Settings").button("Gameplay Settings").button("Recover Starter Items").button(`Content Log Level: ${logger.getLogLevel()}`)
+    .button("Developer Tools");
   const rootResult = await root.show(player);
   if (rootResult.canceled || rootResult.selection === undefined) { logger.trace("settingsMenu", "Settings root canceled", { playerId: player.id }); return; }
   if (rootResult.selection === 1) {
@@ -17,6 +19,10 @@ export async function showSettingsMenu(player) {
   }
   if (rootResult.selection === 2) {
     await showLoggingLevelMenu(player);
+    return;
+  }
+  if (rootResult.selection === 3) {
+    await showDeveloperMenu(player);
     return;
   }
   const state = getPlayerState(player);
