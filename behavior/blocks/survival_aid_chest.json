@@ -28,7 +28,7 @@
           "render_method": "opaque"
         },
         "south": {
-          "texture": "survival_aid_chest",
+          "texture": "survival_aid_chest_side",
           "render_method": "opaque"
         },
         "east": {
@@ -63,7 +63,7 @@
               "render_method": "opaque"
             },
             "south": {
-              "texture": "survival_aid_chest_alt",
+              "texture": "survival_aid_chest_alt_side",
               "render_method": "opaque"
             },
             "east": {
@@ -98,7 +98,7 @@
               "render_method": "opaque"
             },
             "south": {
-              "texture": "survival_aid_chest",
+              "texture": "survival_aid_chest_side",
               "render_method": "opaque"
             },
             "east": {
