@@ -24,7 +24,7 @@
       "minecraft:geometry": "geometry.survival_aid_chest",
       "minecraft:material_instances": {
         "north": {
-          "texture": "survival_aid_chest",
+          "texture": "survival_aid_chest_front",
           "render_method": "opaque"
         },
         "south": {
@@ -46,10 +46,6 @@
         "down": {
           "texture": "survival_aid_chest_top",
           "render_method": "opaque"
-        },
-        "*": {
-          "texture": "survival_aid_chest",
-          "render_method": "opaque"
         }
       }
     },
@@ -59,7 +55,7 @@
         "components": {
           "minecraft:material_instances": {
             "north": {
-              "texture": "survival_aid_chest_alt",
+              "texture": "survival_aid_chest_alt_front",
               "render_method": "opaque"
             },
             "south": {
@@ -80,10 +76,6 @@
             },
             "down": {
               "texture": "survival_aid_chest_alt_top",
-              "render_method": "opaque"
-            },
-            "*": {
-              "texture": "survival_aid_chest_alt",
               "render_method": "opaque"
             }
           }
@@ -94,7 +86,7 @@
         "components": {
           "minecraft:material_instances": {
             "north": {
-              "texture": "survival_aid_chest",
+              "texture": "survival_aid_chest_front",
               "render_method": "opaque"
             },
             "south": {
@@ -115,10 +107,6 @@
             },
             "down": {
               "texture": "survival_aid_chest_top",
-              "render_method": "opaque"
-            },
-            "*": {
-              "texture": "survival_aid_chest",
               "render_method": "opaque"
             }
           }

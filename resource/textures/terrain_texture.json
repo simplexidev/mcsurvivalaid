@@ -9,6 +9,9 @@
         "textures/blocks/survival_aid_chest_side"
       ]
     },
+    "survival_aid_chest_front": {
+      "textures": "textures/blocks/survival_aid_chest_front"
+    },
     "survival_aid_chest_top": {
       "textures": "textures/blocks/survival_aid_chest_top"
     },
@@ -21,6 +24,9 @@
         "textures/blocks/survival_aid_chest_alt_top",
         "textures/blocks/survival_aid_chest_alt_side"
       ]
+    },
+    "survival_aid_chest_alt_front": {
+      "textures": "textures/blocks/survival_aid_chest_alt_front"
     },
     "survival_aid_chest_alt_top": {
       "textures": "textures/blocks/survival_aid_chest_alt_top"
