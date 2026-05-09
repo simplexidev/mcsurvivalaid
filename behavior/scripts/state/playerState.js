@@ -18,7 +18,7 @@ export function createDefaultPlayerState() {
       nextClassChangePromptDay: 20,
       tier5ClaimedCurrent: false
     },
-    deaths: { lastDeathLocation: null },
+    deaths: { lastDeathLocation: null, respawnLocation: null },
     chest: { placed: false, location: null },
     requests: { active: [] },
     quests: { travel: {}, blocksBroken: {}, blocksPlaced: {}, combat: {}, claimedQuestRewards: [], pendingQuestRewards: [] },

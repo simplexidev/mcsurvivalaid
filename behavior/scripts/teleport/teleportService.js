@@ -36,7 +36,8 @@ export function teleportToRespawn(player) {
   if (!canUseCooldown(player, "respawnTeleportReadyTick")) return;
   try {
     const spawn = player.getSpawnPoint?.() ?? null;
-    const target = spawn ?? { dimension: player.dimension.id, ...world.getDefaultSpawnLocation() };
+    const savedRespawn = state.deaths.respawnLocation ?? null;
+    const target = spawn ?? savedRespawn ?? { dimension: player.dimension.id, ...world.getDefaultSpawnLocation() };
     const dimension = target.dimension ? world.getDimension(target.dimension) : player.dimension;
     const safe = resolveSafeTarget(dimension, target.x + 0.5, target.y + 1, target.z + 0.5);
     if (!safe) return player.sendMessage("No safe respawn-adjacent position found.");

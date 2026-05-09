@@ -1,6 +1,7 @@
 import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
 import { world } from "@minecraft/server";
 import { logger } from "../logging/logger.js";
+import { getPlayerState, setPlayerState } from "../state/playerState.js";
 
 function getCommandRunner(target) {
   if (typeof target?.runCommandAsync === "function") {
@@ -81,6 +82,9 @@ async function setRespawnHere(player) {
 
   try {
     await runCommand(player.dimension, `execute as ${playerSelector(player)} run spawnpoint @s ${x} ${y} ${z}`);
+    const state = getPlayerState(player);
+    state.deaths.respawnLocation = { dimension: player.dimension.id, x, y, z };
+    setPlayerState(player, state);
     player.sendMessage(`Developer: respawn point set to ${x}, ${y}, ${z}.`);
     logger.info("developerMenu", "Developer set respawn point", { playerId: player.id, dimension: player.dimension.id, x, y, z });
   } catch (error) {
