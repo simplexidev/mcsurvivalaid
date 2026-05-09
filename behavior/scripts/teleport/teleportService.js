@@ -36,7 +36,8 @@ export function teleportToRespawn(player) {
   if (!canUseCooldown(player, "respawnTeleportReadyTick")) return;
   try {
     const spawn = player.getSpawnPoint?.() ?? null;
-    const target = spawn ?? { dimension: player.dimension.id, ...world.getDefaultSpawnLocation() };
+    const savedRespawn = state.deaths.respawnLocation ?? null;
+    const target = spawn ?? savedRespawn ?? { dimension: player.dimension.id, ...world.getDefaultSpawnLocation() };
     const dimension = target.dimension ? world.getDimension(target.dimension) : player.dimension;
     const safe = resolveSafeTarget(dimension, target.x + 0.5, target.y + 1, target.z + 0.5);
     if (!safe) return player.sendMessage("No safe respawn-adjacent position found.");
@@ -87,9 +88,9 @@ function isSafeStand(dimension, x, y, z) {
     const head = dimension.getBlock({ x, y: y + 1, z });
     const floor = dimension.getBlock({ x, y: y - 1, z });
     if (!feet || !head || !floor) return false;
-    const feetAir = feet.isAir;
-    const headAir = head.isAir;
-    const floorSolid = !floor.isAir;
+    const feetAir = feet.isAir ?? feet.typeId === "minecraft:air";
+    const headAir = head.isAir ?? head.typeId === "minecraft:air";
+    const floorSolid = !(floor.isAir ?? floor.typeId === "minecraft:air");
     return feetAir && headAir && floorSolid;
   } catch {
     return false;
