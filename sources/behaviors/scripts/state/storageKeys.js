@@ -1,6 +1,6 @@
 export const STORAGE_KEYS = {
-  playerStatePrefix: "simplexidev:survival_aid:player:",
-  worldState: "simplexidev:survival_aid:world"
+  playerStatePrefix: "survival_aid:survival_aid:player:",
+  worldState: "survival_aid:survival_aid:world"
 };
 
 export function getPlayerStateKey(player) {
