@@ -88,9 +88,9 @@ function isSafeStand(dimension, x, y, z) {
     const head = dimension.getBlock({ x, y: y + 1, z });
     const floor = dimension.getBlock({ x, y: y - 1, z });
     if (!feet || !head || !floor) return false;
-    const feetAir = feet.isAir;
-    const headAir = head.isAir;
-    const floorSolid = !floor.isAir;
+    const feetAir = feet.isAir ?? feet.typeId === "minecraft:air";
+    const headAir = head.isAir ?? head.typeId === "minecraft:air";
+    const floorSolid = !(floor.isAir ?? floor.typeId === "minecraft:air");
     return feetAir && headAir && floorSolid;
   } catch {
     return false;
