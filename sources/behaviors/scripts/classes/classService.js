@@ -3,6 +3,7 @@ import { getCurrentWorldDay } from "../rewards/rewardService.js";
 import { getPlayerState, setPlayerState } from "../state/playerState.js";
 import { getClassList } from "./classDefinitions.js";
 import { logger } from "../logging/logger.js";
+import { safeShow } from "../ui/safeShow.js";
 
 const activePrompts = new Set();
 
@@ -44,7 +45,7 @@ export async function maybePromptClassChange(player, worldDay) {
   const daysSurvived = Math.max(0, worldDay - state.classTrack.lastDeathDay);
   if (daysSurvived < 20 || worldDay < state.classTrack.nextClassChangePromptDay) { logger.trace("classService", "Class change not yet available", { playerId: player.id, daysSurvived, worldDay, nextPromptDay: state.classTrack.nextClassChangePromptDay }); return; }
   activePrompts.add(player.id);
-  const confirm = await new MessageFormData().title("Class Change Available").body("You can change class now. Change class?").button1("Change").button2("Keep Current").show(player);
+  const confirm = await safeShow(new MessageFormData().title("Class Change Available").body("You can change class now. Change class?").button1("Change").button2("Keep Current"), player, "classService", "class_change_confirm");
   if (confirm.canceled || confirm.selection !== 0) {
     state.classTrack.nextClassChangePromptDay = worldDay + 10;
     state.classTrack.tier5ClaimedCurrent = false;
@@ -58,7 +59,7 @@ export async function maybePromptClassChange(player, worldDay) {
   const form = new ActionFormData().title("Select New Class").body("Choose your new class track.");
   for (const c of available) form.button(`${c.name}
 ${c.description}`);
-  const result = await form.show(player);
+  const result = await safeShow(form, player, "classService", "class_change_select");
   if (result.canceled || result.selection === undefined) { state.classTrack.nextClassChangePromptDay = worldDay + 10; setPlayerState(player, state); activePrompts.delete(player.id); logger.info("classService", "Class selection canceled", { playerId: player.id }); return; }
   changeClass(player, available[result.selection].id);
   player.sendMessage(`Class changed to ${available[result.selection].name}.`);

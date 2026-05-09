@@ -1,12 +1,13 @@
 import { ActionFormData } from "@minecraft/server-ui";
 import { findNearestKnownStructure, registerKnownStructure } from "../state/worldState.js";
+import { safeShow } from "../ui/safeShow.js";
 
 const STRUCTURE_TYPES = ["village","shipwreck","desert_pyramid","jungle_pyramid","pillager_outpost","stronghold","ancient_city","trail_ruins","mineshaft","monument","fortress","bastion_remnant"];
 
 export async function showStructureLocatorMenu(player) {
   const form = new ActionFormData().title("Structure Locator").body("Choose a structure type.");
   for (const s of STRUCTURE_TYPES) form.button(formatStructureName(s));
-  const result = await form.show(player);
+  const result = await safeShow(form, player, "structureLocator", "type_select");
   if (result.canceled || result.selection === undefined) return;
   const selected = STRUCTURE_TYPES[result.selection];
   await showStructureActionMenu(player, selected);
@@ -14,7 +15,7 @@ export async function showStructureLocatorMenu(player) {
 
 async function showStructureActionMenu(player, selected) {
   const form = new ActionFormData().title(formatStructureName(selected)).button("Locate Automatically").button("Register Current Position as Known");
-  const result = await form.show(player);
+  const result = await safeShow(form, player, "structureLocator", "action_select");
   if (result.canceled || result.selection === undefined) return;
   if (result.selection === 1) {
     registerKnownStructure(selected, player.dimension.id, player.location.x, player.location.y, player.location.z);

@@ -5,6 +5,7 @@ import { getPlayerState, setPlayerState } from "../state/playerState.js";
 import { getClassList } from "../classes/classDefinitions.js";
 import { setInitialClass } from "../classes/classService.js";
 import { logger } from "../logging/logger.js";
+import { safeShow } from "./safeShow.js";
 
 const activeInitialPrompts = new Set();
 
@@ -68,7 +69,7 @@ async function showRequiredMessageForm(player, form, flow) {
   let attempts = 0;
   while (true) {
     attempts++;
-    const result = await form.show(player);
+    const result = await safeShow(form, player, "firstSpawn", `required_message_${flow}`);
     if (!result.canceled && result.selection !== undefined) return result;
     if (attempts <= 3 || attempts % 10 === 0) {
       logger.warn("firstSpawn", "Required message form canceled; re-showing", { playerId: player.id, flow, attempts });
@@ -81,7 +82,7 @@ async function showRequiredActionForm(player, form, flow) {
   let attempts = 0;
   while (true) {
     attempts++;
-    const result = await form.show(player);
+    const result = await safeShow(form, player, "firstSpawn", `required_action_${flow}`);
     if (!result.canceled && result.selection !== undefined) return result;
     if (attempts <= 3 || attempts % 10 === 0) {
       logger.warn("firstSpawn", "Required action form canceled; re-showing", { playerId: player.id, flow, attempts });

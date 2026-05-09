@@ -2,6 +2,7 @@ import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
 import { world } from "@minecraft/server";
 import { logger } from "../logging/logger.js";
 import { getPlayerState, setPlayerState } from "../state/playerState.js";
+import { safeShow } from "./safeShow.js";
 
 function getCommandRunner(target) {
   if (typeof target?.runCommandAsync === "function") {
@@ -31,7 +32,7 @@ export async function showDeveloperMenu(player) {
     .button("Set Respawn Here")
     .button("Kill Player Instantly");
 
-  const result = await form.show(player);
+  const result = await safeShow(form, player, "developerMenu", "root");
   if (result.canceled || result.selection === undefined) {
     logger.trace("developerMenu", "Developer menu canceled", { playerId: player.id });
     return;
@@ -55,7 +56,7 @@ async function showSkipDaysMenu(player) {
     .title("Skip Days")
     .slider("Days to skip", 1, 365, { step: 1, defaultValue: 1 });
 
-  const result = await form.show(player);
+  const result = await safeShow(form, player, "developerMenu", "skip_days");
   if (result.canceled || !result.formValues) {
     logger.trace("developerMenu", "Skip days canceled", { playerId: player.id });
     return;

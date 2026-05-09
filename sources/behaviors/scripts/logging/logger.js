@@ -3,8 +3,11 @@ import { world } from "@minecraft/server";
 const LOG_LEVELS = { trace: 10, info: 20, warn: 30, error: 40 };
 const DEFAULT_LEVEL = "info";
 const LOG_PROPERTY = "survivalaid:logLevel";
+const TRACE_SAMPLE_PROPERTY = "survivalaid:traceSampleRate";
+const TRACE_MIN_INTERVAL_PROPERTY = "survivalaid:traceMinIntervalTicks";
 let cachedLevel = DEFAULT_LEVEL;
 let hasWarnedEarlyExecution = false;
+const traceLastByKey = new Map();
 
 function getConfiguredLevel() {
   try {
@@ -29,6 +32,7 @@ function shouldLog(level) {
 
 function emit(level, scope, message, context) {
   if (!shouldLog(level)) return;
+  if (level === "trace" && !shouldEmitTrace(scope, message)) return;
   const prefix = `[Survival Aid][${level.toUpperCase()}][${scope}] ${message}`;
   const contextText = context ? ` | ${safeJson(context)}` : "";
   const line = `${prefix}${contextText}`;
@@ -37,6 +41,17 @@ function emit(level, scope, message, context) {
     return;
   }
   console.log(line);
+}
+function shouldEmitTrace(scope, message) {
+  const tick = Number(world.getAbsoluteTime?.() ?? 0);
+  const sampleRate = Math.max(1, Number(world.getDynamicProperty(TRACE_SAMPLE_PROPERTY) ?? 20));
+  const minInterval = Math.max(0, Number(world.getDynamicProperty(TRACE_MIN_INTERVAL_PROPERTY) ?? 40));
+  if (tick % sampleRate !== 0) return false;
+  const key = `${scope}:${message}`;
+  const lastTick = traceLastByKey.get(key);
+  if (lastTick !== undefined && tick - lastTick < minInterval) return false;
+  traceLastByKey.set(key, tick);
+  return true;
 }
 
 function safeJson(value) {
