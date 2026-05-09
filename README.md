@@ -19,17 +19,15 @@ Beta, feature-complete scaffold with placeholder art assets.
 - Enable script/add-on related experiments if your build still gates APIs.
 
 ## Install (development packs)
-1. Copy `behavior/` to `development_behavior_packs/SurvivalAid_BP`.
-2. Copy `resource/` to `development_resource_packs/SurvivalAid_RP`.
+1. Copy `sources/behaviors/` to `development_behavior_packs/SurvivalAid_BP`.
+2. Copy `sources/resources/` to `development_resource_packs/SurvivalAid_RP`.
 3. Activate both packs on a test world.
 4. Ensure Content Log is visible for debugging.
 
 ## Assets in this repository
 - The resource pack already includes item/block texture source files:
-  - `resource/textures/items/book_of_survival.png`
-  - `resource/textures/blocks/survival_aid_chest_top.png`
-  - `resource/textures/blocks/survival_aid_chest_side.png`
-  - `resource/textures/blocks/survival_aid_chest_front.png`
+  - `sources/resources/textures/items/book_of_survival.png`
+  - `sources/resources/textures/blocks/survival_aid_chest.png`
 - PBR companion maps (`*_mers.tga`) and `.texture_set.json` files are included for these textures.
 - No additional "compiled texture" outputs are required in-repo for Bedrock development pack loading.
 
@@ -45,7 +43,7 @@ Beta, feature-complete scaffold with placeholder art assets.
 
 
 ## Implementation checklist
-See `.codex/current-task-status.md` for a full, tracked feature checklist.
+Track checklist/progress in your issue tracker or project board (no in-repo status file is currently maintained).
 
 
 ## Packaging (optional)
