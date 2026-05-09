@@ -1,19 +1,19 @@
 export const ADDON = {
-  namespace: "simplexidev",
+  namespace: "survival_aid",
   name: "Survival Aid",
   author: "SimplexiDev",
 
   blocks: {
-    survivalChest: "simplexidev:survival_aid_chest"
+    survivalChest: "survival_aid:survival_aid_chest"
   },
 
   items: {
-    bookOfSurvival: "simplexidev:book_of_survival"
+    bookOfSurvival: "survival_aid:book_of_survival"
   },
 
   components: {
-    survivalChest: "simplexidev:survival_aid_chest_component",
-    bookOfSurvival: "simplexidev:book_of_survival_component"
+    survivalChest: "survival_aid:survival_aid_chest_component",
+    bookOfSurvival: "survival_aid:book_of_survival_component"
   }
 };
 
