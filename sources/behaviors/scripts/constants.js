@@ -8,12 +8,12 @@ export const ADDON = {
   },
 
   items: {
-    bookOfSurvival: "simplexidev:book_of_survival"
+    bookOfSurvival: "survival_aid:book_of_survival"
   },
 
   components: {
     survivalChest: "survival_aid:survival_aid_chest_component",
-    bookOfSurvival: "simplexidev:book_of_survival_component"
+    bookOfSurvival: "survival_aid:book_of_survival_component"
   }
 };
 
