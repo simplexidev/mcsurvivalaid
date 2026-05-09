@@ -1,10 +1,10 @@
 @echo off
 setlocal
 
-set "MINECRAFT_DIR=C:\Users\SimplexiDev\AppData\Roaming\Minecraft Bedrock\Users\Shared\games\com.mojang"
+set "MINECRAFT_DIR=%APPDATA%\Minecraft Bedrock\Users\Shared\games\com.mojang"
 
-set "SRC_BP=%~dp0behavior"
-set "SRC_RP=%~dp0resource"
+set "SRC_BP=%~dp0behaviors"
+set "SRC_RP=%~dp0resources"
 
 set "DEST_BP=%MINECRAFT_DIR%\development_behavior_packs\SurvivalAid_BP"
 set "DEST_RP=%MINECRAFT_DIR%\development_resource_packs\SurvivalAid_RP"

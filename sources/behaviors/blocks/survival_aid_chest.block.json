@@ -1,0 +1,33 @@
+{
+  "format_version": "1.21.20",
+  "minecraft:block": {
+    "description": {
+      "identifier": "survival_aid:survival_aid_chest",
+      "menu_category": {
+        "category": "items"
+      },
+      "states": {
+        "survival_aid:has_reward": [ false, true ],
+        "survival_aid:is_open": [ false, true ]
+      }
+    },
+    "components": {
+      "minecraft:custom_components": [
+        "survival_aid:survival_aid_chest_component"
+      ],
+      "minecraft:destructible_by_mining": {
+        "seconds_to_destroy": 1
+      },
+      "minecraft:destructible_by_explosion": {
+        "explosion_resistance": 15
+      },
+      "minecraft:geometry": "geometry.survival_aid_chest",
+      "minecraft:material_instances": {
+        "*": {
+          "texture": "survival_aid_chest",
+          "render_method": "opaque"
+        }
+      }
+    }
+  }
+}

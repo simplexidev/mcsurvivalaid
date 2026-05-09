@@ -51,14 +51,10 @@ export function registerSurvivalChestComponent(event) {
 }
 
 export function handleSurvivalChestInteract(player, block) {
-  const state = getPlayerState(player);
   const own = state.chest.location;
   const b = block.location;
   const isOwnChest = !!own && own.dimension === block.dimension.id && own.x === b.x && own.y === b.y && own.z === b.z;
-
-  pulseOpenState(block);
   claimPendingRewards(player, { includeClassAndQuestRewards: isOwnChest });
-  tryUpdateChestVisual(block, player);
 }
 
 export function syncChestVisualForPlayer(player) {
@@ -73,17 +69,9 @@ export function syncChestVisualForPlayer(player) {
       player.sendMessage("Your registered Survival Chest was missing or replaced; registration cleared.");
       return;
     }
-    tryUpdateChestVisual(block, player);
   } catch {
     player.sendMessage("Could not access your registered Survival Chest dimension; registration preserved.");
   }
-}
-
-function tryUpdateChestVisual(block, player) {
-  const state = getPlayerState(player);
-  if (!state.settings.chestChangesTexture) return;
-  const ready = hasPendingRewards(player);
-  try { block.setPermutation(block.permutation.withState("simplexidev:has_reward", ready)); } catch {}
 }
 
 function clearChestRegistration(state) {
@@ -91,15 +79,3 @@ function clearChestRegistration(state) {
   state.chest.location = null;
 }
 
-function pulseOpenState(block) {
-  try {
-    block.setPermutation(block.permutation.withState("simplexidev:is_open", true));
-    system.runTimeout(() => {
-      try {
-        const current = block.dimension.getBlock(block.location);
-        if (!current) return;
-        current.setPermutation(current.permutation.withState("simplexidev:is_open", false));
-      } catch {}
-    }, 10);
-  } catch {}
-}
