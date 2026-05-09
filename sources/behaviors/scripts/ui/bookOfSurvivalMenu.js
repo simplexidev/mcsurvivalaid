@@ -8,6 +8,7 @@ import { showDocumentationMenu } from "./documentationMenu.js";
 import { teleportToRespawn, teleportToLastDeath } from "../teleport/teleportService.js";
 import { showStructureLocatorMenu } from "../structures/structureLocator.js";
 import { showItemRequestsMenu } from "../items/requestService.js";
+import { safeShow } from "./safeShow.js";
 
 const lastHudText = new Map();
 
@@ -22,7 +23,7 @@ export async function showBookOfSurvivalMenu(player) {
     .button("In-Game Documentation")
     .button("Add-On Settings");
 
-  const result = await form.show(player);
+  const result = await safeShow(form, player, "bookOfSurvivalMenu", "root");
 
   if (result.canceled || result.selection === undefined) {
     return;

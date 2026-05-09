@@ -1,5 +1,6 @@
 import { ActionFormData } from "@minecraft/server-ui";
 import { getPlayerState } from "../state/playerState.js";
+import { safeShow } from "./safeShow.js";
 
 const PAGES = [
   ["What Survival Aid Is", "A Bedrock survival helper with rewards, requests, teleports, and progress tracking."],
@@ -18,14 +19,14 @@ export async function showDocumentationMenu(player) {
   let form = new ActionFormData().title("Survival Aid Documentation").body("Select a topic.");
   for (const [name] of PAGES) form.button(name);
   form.button("Quest Progress Snapshot");
-  const res = await form.show(player);
+  const res = await safeShow(form, player, "documentationMenu", "topic_select");
   if (res.canceled || res.selection === undefined) return;
   if (res.selection === PAGES.length) {
     const q = state.quests;
     const body = `Travel: ${JSON.stringify(q.travel)}\nBlocks Broken: ${JSON.stringify(q.blocksBroken)}\nBlocks Placed: ${JSON.stringify(q.blocksPlaced)}\nCombat: ${JSON.stringify(q.combat)}`;
-    await new ActionFormData().title("Quest Progress Snapshot").body(body).button("Back").show(player);
+    await safeShow(new ActionFormData().title("Quest Progress Snapshot").body(body).button("Back"), player, "documentationMenu", "quest_snapshot");
     return;
   }
   const [title, body] = PAGES[res.selection];
-  await new ActionFormData().title(title).body(body + progress).button("Back").show(player);
+  await safeShow(new ActionFormData().title(title).body(body + progress).button("Back"), player, "documentationMenu", "topic_detail");
 }

@@ -2,23 +2,24 @@ import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
 import { system } from "@minecraft/server";
 import { getPlayerState, setPlayerState } from "../state/playerState.js";
 import { logger } from "../logging/logger.js";
+import { safeShow } from "../ui/safeShow.js";
 
 const REQUESTABLE_ITEMS = ["coal","raw_iron","raw_copper","raw_gold","redstone","lapis_lazuli","oak_log","spruce_log","birch_log","cobblestone","sand","gravel","clay_ball","wheat_seeds","sugar_cane"];
 
 export async function showItemRequestsMenu(player) {
   const root = new ActionFormData().title("Item Requests").button("Create Request").button("View Active Requests").button("Cancel Request");
-  const rootResult = await root.show(player);
+  const rootResult = await safeShow(root, player, "requestService", "root");
   if (rootResult.canceled || rootResult.selection === undefined) { logger.trace("requestService", "Request root menu canceled", { playerId: player.id }); return; }
   if (rootResult.selection === 1) return showActiveRequests(player);
   if (rootResult.selection === 2) return showCancelRequestMenu(player);
 
   const form = new ActionFormData().title("Item Requests").body("Select an item to request.");
   for (const item of REQUESTABLE_ITEMS) form.button(item);
-  const result = await form.show(player);
+  const result = await safeShow(form, player, "requestService", "item_select");
   if (result.canceled || result.selection === undefined) { logger.trace("requestService", "Request item selection canceled", { playerId: player.id }); return; }
   const itemId = `minecraft:${REQUESTABLE_ITEMS[result.selection]}`;
   const qtyForm = new ModalFormData().title("Request Quantity").slider("Quantity", 1, 64, { step: 1, defaultValue: 1 });
-  const qtyResult = await qtyForm.show(player);
+  const qtyResult = await safeShow(qtyForm, player, "requestService", "quantity");
   if (qtyResult.canceled || !qtyResult.formValues) { logger.trace("requestService", "Request quantity canceled", { playerId: player.id }); return; }
   queueItemRequest(player, itemId, Math.floor(qtyResult.formValues[0]));
 }
@@ -40,7 +41,7 @@ async function showCancelRequestMenu(player) {
     const sec = Math.max(0, Math.ceil((req.readyAtTick - system.currentTick) / 20));
     form.button(`${req.itemId} x${req.quantity}\n${sec}s remaining`);
   }
-  const result = await form.show(player);
+  const result = await safeShow(form, player, "requestService", "cancel_select");
   if (result.canceled || result.selection === undefined) { logger.trace("requestService", "Request item selection canceled", { playerId: player.id }); return; }
   const selected = active[result.selection];
   state.requests.active = state.requests.active.filter(r => r !== selected);

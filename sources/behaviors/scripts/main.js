@@ -56,10 +56,12 @@ runCompatibilityProbe();
 logger.info("main", `${ADDON.name} loaded.`, { logLevel: logger.getLogLevel() });
 
 function runCompatibilityProbe() {
+  const samplePlayer = world.getPlayers()[0];
   const checks = [
     ["afterEvents.playerSpawn", typeof world.afterEvents?.playerSpawn?.subscribe === "function"],
     ["beforeEvents.startup", typeof system.beforeEvents?.startup?.subscribe === "function"],
-    ["player.onScreenDisplay.setActionBar", typeof world.getAllPlayers !== "undefined"],
+    ["world.getPlayers", typeof world.getPlayers === "function"],
+    ["player.onScreenDisplay.setActionBar", typeof samplePlayer?.onScreenDisplay?.setActionBar === "function" || world.getPlayers().length === 0],
   ];
   const failed = checks.filter(([, ok]) => !ok).map(([name]) => name);
   if (failed.length > 0) {
