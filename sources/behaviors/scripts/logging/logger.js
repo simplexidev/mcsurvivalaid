@@ -1,57 +1,148 @@
 import { world } from "@minecraft/server";
 
-const LOG_LEVELS = { trace: 10, info: 20, warn: 30, error: 40 };
+const TAG = "Survival Aid";
+
+const LOG_LEVELS = Object.freeze({
+  trace: 10,
+  info: 20,
+  warn: 30,
+  error: 40
+});
+
 const DEFAULT_LEVEL = "info";
-const LOG_PROPERTY = "survivalaid:logLevel";
-const TRACE_SAMPLE_PROPERTY = "survivalaid:traceSampleRate";
-const TRACE_MIN_INTERVAL_PROPERTY = "survivalaid:traceMinIntervalTicks";
+
+const PROPERTIES = Object.freeze({
+  logLevel: "survivalaid:logLevel",
+  traceSampleRate: "survivalaid:traceSampleRate",
+  traceMinIntervalTicks: "survivalaid:traceMinIntervalTicks"
+});
+
+const DEFAULT_TRACE_SAMPLE_RATE = 20;
+const DEFAULT_TRACE_MIN_INTERVAL_TICKS = 40;
+
 let cachedLevel = DEFAULT_LEVEL;
-let hasWarnedEarlyExecution = false;
+let cachedTraceSampleRate = DEFAULT_TRACE_SAMPLE_RATE;
+let cachedTraceMinInterval = DEFAULT_TRACE_MIN_INTERVAL_TICKS;
+let warnedDynamicPropertiesUnavailable = false;
+
 const traceLastByKey = new Map();
 
-function getConfiguredLevel() {
+function getDynamicProperty(name, fallback) {
   try {
-    const raw = world.getDynamicProperty(LOG_PROPERTY);
-    if (typeof raw === "string" && LOG_LEVELS[raw] !== undefined) {
-      cachedLevel = raw;
-      return raw;
-    }
+    const value = world.getDynamicProperty(name);
+    return value ?? fallback;
   } catch (error) {
-    if (!hasWarnedEarlyExecution) {
-      hasWarnedEarlyExecution = true;
-      console.warn(`[Survival Aid][WARN][logger] Dynamic properties unavailable yet; using cached/default log level. | ${safeJson({ error: String(error) })}`);
-    }
+    warnDynamicPropertiesUnavailable(error);
+    return fallback;
   }
-  if (LOG_LEVELS[cachedLevel] !== undefined) return cachedLevel;
-  return DEFAULT_LEVEL;
+}
+
+function setDynamicProperty(name, value) {
+  try {
+    world.setDynamicProperty(name, value);
+    return true;
+  } catch (error) {
+    warnDynamicPropertiesUnavailable(error);
+    return false;
+  }
+}
+
+function warnDynamicPropertiesUnavailable(error) {
+  if (warnedDynamicPropertiesUnavailable) return;
+
+  warnedDynamicPropertiesUnavailable = true;
+
+  console.warn(
+    formatLine(
+      "warn",
+      "logger",
+      "Dynamic properties unavailable yet; using cached/default logger configuration.",
+      { error: String(error) }
+    )
+  );
+}
+
+function getConfiguredLevel() {
+  const raw = getDynamicProperty(PROPERTIES.logLevel, cachedLevel);
+
+  if (typeof raw === "string" && isValidLevel(raw)) {
+    cachedLevel = raw;
+    return raw;
+  }
+
+  return isValidLevel(cachedLevel) ? cachedLevel : DEFAULT_LEVEL;
+}
+
+function getTraceSampleRate() {
+  const raw = getDynamicProperty(PROPERTIES.traceSampleRate, cachedTraceSampleRate);
+  const value = Math.max(1, Number(raw) || DEFAULT_TRACE_SAMPLE_RATE);
+
+  cachedTraceSampleRate = value;
+  return value;
+}
+
+function getTraceMinInterval() {
+  const raw = getDynamicProperty(PROPERTIES.traceMinIntervalTicks, cachedTraceMinInterval);
+  const value = Math.max(0, Number(raw) || DEFAULT_TRACE_MIN_INTERVAL_TICKS);
+
+  cachedTraceMinInterval = value;
+  return value;
+}
+
+function isValidLevel(level) {
+  return LOG_LEVELS[level] !== undefined;
 }
 
 function shouldLog(level) {
   return LOG_LEVELS[level] >= LOG_LEVELS[getConfiguredLevel()];
 }
 
+function shouldEmitTrace(scope, message) {
+  const tick = Number(world.getAbsoluteTime?.() ?? 0);
+
+  if (tick % getTraceSampleRate() !== 0) {
+    return false;
+  }
+
+  const key = `${scope}:${message}`;
+  const lastTick = traceLastByKey.get(key);
+
+  if (lastTick !== undefined && tick - lastTick < getTraceMinInterval()) {
+    return false;
+  }
+
+  traceLastByKey.set(key, tick);
+  return true;
+}
+
 function emit(level, scope, message, context) {
   if (!shouldLog(level)) return;
   if (level === "trace" && !shouldEmitTrace(scope, message)) return;
-  const prefix = `[Survival Aid][${level.toUpperCase()}][${scope}] ${message}`;
-  const contextText = context ? ` | ${safeJson(context)}` : "";
-  const line = `${prefix}${contextText}`;
-  if (level === "warn" || level === "error") {
-    console.warn(line);
-    return;
+
+  const line = formatLine(level, scope, message, context);
+
+  switch (level) {
+    case "error":
+      if (typeof console.error === "function") {
+        console.error(line);
+      } else {
+        console.warn(line);
+      }
+      break;
+
+    case "warn":
+      console.warn(line);
+      break;
+
+    default:
+      console.log(line);
+      break;
   }
-  console.log(line);
 }
-function shouldEmitTrace(scope, message) {
-  const tick = Number(world.getAbsoluteTime?.() ?? 0);
-  const sampleRate = Math.max(1, Number(world.getDynamicProperty(TRACE_SAMPLE_PROPERTY) ?? 20));
-  const minInterval = Math.max(0, Number(world.getDynamicProperty(TRACE_MIN_INTERVAL_PROPERTY) ?? 40));
-  if (tick % sampleRate !== 0) return false;
-  const key = `${scope}:${message}`;
-  const lastTick = traceLastByKey.get(key);
-  if (lastTick !== undefined && tick - lastTick < minInterval) return false;
-  traceLastByKey.set(key, tick);
-  return true;
+
+function formatLine(level, scope, message, context) {
+  const prefix = `[${TAG}][${level.toUpperCase()}][${scope}] ${message}`;
+  return context === undefined ? prefix : `${prefix} | ${safeJson(context)}`;
 }
 
 function safeJson(value) {
@@ -63,21 +154,57 @@ function safeJson(value) {
 }
 
 export const logger = {
-  trace: (scope, message, context) => emit("trace", scope, message, context),
-  info: (scope, message, context) => emit("info", scope, message, context),
-  warn: (scope, message, context) => emit("warn", scope, message, context),
-  error: (scope, message, context) => emit("error", scope, message, context),
+  trace(scope, message, context) {
+    emit("trace", scope, message, context);
+  },
+
+  info(scope, message, context) {
+    emit("info", scope, message, context);
+  },
+
+  warn(scope, message, context) {
+    emit("warn", scope, message, context);
+  },
+
+  error(scope, message, context) {
+    emit("error", scope, message, context);
+  },
+
   setLogLevel(level) {
-    if (LOG_LEVELS[level] === undefined) return false;
+    if (!isValidLevel(level)) return false;
+
     cachedLevel = level;
-    try {
-      world.setDynamicProperty(LOG_PROPERTY, level);
-    } catch (error) {
-      emit("warn", "logger", "Failed to persist log level; using cached level only", { level, error: String(error) });
+
+    if (!setDynamicProperty(PROPERTIES.logLevel, level)) {
+      emit("warn", "logger", "Failed to persist log level; using cached level only.", { level });
     }
+
     return true;
   },
+
   getLogLevel() {
     return getConfiguredLevel();
+  },
+
+  setTraceSampleRate(rate) {
+    const value = Math.max(1, Number(rate) || DEFAULT_TRACE_SAMPLE_RATE);
+    cachedTraceSampleRate = value;
+
+    if (!setDynamicProperty(PROPERTIES.traceSampleRate, value)) {
+      emit("warn", "logger", "Failed to persist trace sample rate; using cached value only.", { value });
+    }
+
+    return value;
+  },
+
+  setTraceMinIntervalTicks(ticks) {
+    const value = Math.max(0, Number(ticks) || DEFAULT_TRACE_MIN_INTERVAL_TICKS);
+    cachedTraceMinInterval = value;
+
+    if (!setDynamicProperty(PROPERTIES.traceMinIntervalTicks, value)) {
+      emit("warn", "logger", "Failed to persist trace minimum interval; using cached value only.", { value });
+    }
+
+    return value;
   }
 };

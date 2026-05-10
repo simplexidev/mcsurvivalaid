@@ -2,18 +2,18 @@
   "format_version": "1.21.20",
   "minecraft:block": {
     "description": {
-      "identifier": "simplexidev:survival_aid_chest",
+      "identifier": "survival_aid:survival_aid_chest",
       "menu_category": {
         "category": "items"
       },
       "states": {
-        "simplexidev:has_reward": [ false, true ],
-        "simplexidev:is_open": [ false, true ]
+        "survival_aid:has_reward": [ false, true ],
+        "survival_aid:is_open": [ false, true ]
       }
     },
     "components": {
       "minecraft:custom_components": [
-        "simplexidev:survival_aid_chest_component"
+        "survival_aid:survival_aid_chest_component"
       ],
       "minecraft:destructible_by_mining": {
         "seconds_to_destroy": 1

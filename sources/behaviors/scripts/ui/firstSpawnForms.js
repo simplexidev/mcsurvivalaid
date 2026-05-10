@@ -18,7 +18,7 @@ export async function handleInitialSpawn(player) {
 
   activeInitialPrompts.add(player.id);
 
-  const enableForm = new MessageFormData().title("Survival Aid").body("Enable Survival Aid rewards and utilities?").button1("Enable").button2("Disable");
+  const enableForm = new MessageFormData().title("Survival Aid Add-On").body("This world allows for world-based quests, daily rewards, and other helpful survival utilities. Would you like to enable these features?").button1("Enable").button2("Disable");
   const enableResult = await showRequiredMessageForm(player, enableForm, "initial_enable");
 
   if (enableResult.selection !== 0) {

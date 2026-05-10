@@ -5,9 +5,9 @@ Bedrock Edition add-on by SimplexiDev. **Bedrock-only** (not Java mods).
 Beta, feature-complete scaffold with placeholder art assets.
 
 ## Features
-- Survival Chest (`simplexidev:survival_aid_chest`) reward terminal.
+- Survival Chest (`survival_aid:survival_aid_chest`) reward terminal.
 - Survival Chest interaction is reward-dispenser style (claims currently available rewards to the player), not a persistent inventory container.
-- Book of Survival (`simplexidev:book_of_survival`) UI hub.
+- Book of Survival (`survival_aid:book_of_survival`) UI hub.
 - First-spawn enable + class select flow.
 - Per-player dynamic-property state, class tracking, HUD, quests/rewards scaffolding.
 - Teleport to respawn and last death helpers.

@@ -1,0 +1,13 @@
+{
+  "name": "survival_aid",
+  "version": "0.1.0",
+  "productName": "Survival Aid Minecraft Bedrock Add-On",
+  "description": "Survival Aid Minecraft Bedrock Add-On",
+  "private": true,
+  "dependencies": {
+    "@minecraft/math": "^2.4.0",
+    "@minecraft/server": "^2.7.0",
+    "@minecraft/server-ui": "^2.0.0",
+    "@minecraft/vanilla-data": "^1.26.20"
+  }
+}

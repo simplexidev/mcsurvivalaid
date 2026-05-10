@@ -3,6 +3,11 @@ import { getPlayerState, setPlayerState } from "../state/playerState.js";
 import { logger } from "../logging/logger.js";
 import { getCurrentWorldDay } from "../rewards/rewardService.js";
 
+//TODO: Implement and incorporate these. Locations should be named, and will be available to be added by the player via the book. initial spawn, respawn point and death locations will have the names "Initial Spawn", "Respawn", and "Last Death" respectively.
+export function registerTeleportLocation(player, name, dimension, x, y, z) { }
+export function removeTeleportLocation(player, name) { }
+export function teleportPlayer(player, name) { }
+
 export function handlePlayerDeath(event) {
   const dead = event.deadEntity;
   if (!dead || dead.typeId !== "minecraft:player") return;

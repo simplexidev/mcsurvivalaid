@@ -9,6 +9,9 @@
     },
     "components": {
       "minecraft:icon": "book_of_survival",
+      "minecraft:display_name": {
+        "value": "item.survival_aid.bool_of_survival.name"
+      },
       "minecraft:offhand": false,
       "minecraft:rarity": "epic",
       "minecraft:max_stack_size": 1,

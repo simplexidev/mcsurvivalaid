@@ -1,6 +1,6 @@
 {
   "format_version": "1.21.0",
-  "simplexidev:survival_aid_chest": {
+  "survival_aid:survival_aid_chest": {
     "sound": "wood"
   }
 }
