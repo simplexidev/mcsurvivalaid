@@ -1,8 +1,18 @@
+import type { Player } from "@minecraft/server";
 import { world } from "@minecraft/server";
 import { getPlayerStateKey } from "./storageKeys.js";
 import { logger } from "../logging/logger.js";
+import type { PlayerState } from "../types/domain.js";
 
-export function createDefaultPlayerState() {
+function isObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function asObject(value: unknown): Record<string, unknown> {
+  return isObject(value) ? value : {};
+}
+
+export function createDefaultPlayerState(): PlayerState {
   return {
     stateVersion: 1,
     hasSeenInitialPrompt: false,
@@ -31,15 +41,16 @@ export function createDefaultPlayerState() {
   };
 }
 
-export function getPlayerState(player) {
+export function getPlayerState(player: Player): PlayerState {
   const raw = world.getDynamicProperty(getPlayerStateKey(player));
   if (typeof raw !== "string" || raw.length === 0) { logger.trace("playerState", "No saved state, using defaults", { playerId: player.id }); return createDefaultPlayerState(); }
   try {
-    const parsed = JSON.parse(raw);
+    const parsed: unknown = JSON.parse(raw);
+    if (!isObject(parsed)) return createDefaultPlayerState();
     const d = createDefaultPlayerState();
-    return { ...d, ...parsed, classTrack: { ...d.classTrack, ...(parsed.classTrack ?? {}) }, deaths: { ...d.deaths, ...(parsed.deaths ?? {}) }, chest: { ...d.chest, ...(parsed.chest ?? {}) }, requests: { ...d.requests, ...(parsed.requests ?? {}) }, quests: { ...d.quests, ...(parsed.quests ?? {}) }, cooldowns: { ...d.cooldowns, ...(parsed.cooldowns ?? {}) }, settings: { ...d.settings, ...(parsed.settings ?? {}) } };
-  } catch (error) { logger.warn("playerState", "Failed to parse player state; using defaults", { playerId: player.id, error: String(error) }); return createDefaultPlayerState(); }
+    return { ...d, ...parsed, classTrack: { ...d.classTrack, ...asObject(parsed.classTrack) }, deaths: { ...d.deaths, ...asObject(parsed.deaths) }, chest: { ...d.chest, ...asObject(parsed.chest) }, requests: { ...d.requests, ...asObject(parsed.requests) }, quests: { ...d.quests, ...asObject(parsed.quests) }, cooldowns: { ...d.cooldowns, ...asObject(parsed.cooldowns) }, settings: { ...d.settings, ...asObject(parsed.settings) } };
+  } catch (error: unknown) { logger.warn("playerState", "Failed to parse player state; using defaults", { playerId: player.id, error: String(error) }); return createDefaultPlayerState(); }
 }
 
-export function setPlayerState(player, state) { world.setDynamicProperty(getPlayerStateKey(player), JSON.stringify(state)); logger.trace("playerState", "Player state saved", { playerId: player.id }); }
-export function updatePlayerState(player, updater) { const state = getPlayerState(player); const updated = updater(state) ?? state; setPlayerState(player, updated); return updated; }
+export function setPlayerState(player: Player, state: PlayerState): void { world.setDynamicProperty(getPlayerStateKey(player), JSON.stringify(state)); logger.trace("playerState", "Player state saved", { playerId: player.id }); }
+export function updatePlayerState(player: Player, updater: (state: PlayerState) => PlayerState | undefined): PlayerState { const state = getPlayerState(player); const updated = updater(state) ?? state; setPlayerState(player, updated); return updated; }

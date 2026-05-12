@@ -6,6 +6,7 @@ import { getClassList } from "../classes/classDefinitions.js";
 import { setInitialClass } from "../classes/classService.js";
 import { logger } from "../logging/logger.js";
 import { safeShow } from "./safeShow.js";
+import { MinecraftComponentId } from "../types/domain.js";
 
 const activeInitialPrompts = new Set();
 
@@ -98,7 +99,7 @@ function waitTicks(ticks) {
 }
 
 export function giveStarterItems(player) {
-  const inventory = player.getComponent("minecraft:inventory")?.container;
+  const inventory = player.getComponent(MinecraftComponentId.Inventory)?.container;
   if (!inventory) { logger.warn("firstSpawn", "No inventory container for starter items", { playerId: player.id }); return; }
   ensureOneItem(inventory, ADDON.blocks.survivalChest);
   ensureOneItem(inventory, ADDON.items.bookOfSurvival);

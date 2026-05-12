@@ -2,6 +2,7 @@ import { ItemStack, world, system } from "@minecraft/server";
 import { ADDON } from "../constants.js";
 import { getPlayerState, setPlayerState } from "../state/playerState.js";
 import { claimPendingRewards, hasPendingRewards } from "../rewards/rewardService.js";
+import { MinecraftComponentId } from "../types/domain.js";
 
 export function registerSurvivalChestComponent(event) {
   event.blockComponentRegistry.registerCustomComponent(ADDON.components.survivalChest, {
@@ -12,7 +13,7 @@ export function registerSurvivalChestComponent(event) {
       if (state.chest.placed && state.chest.location) {
         player.sendMessage("You can only have one Survival Chest.");
         try { args.block.setType("minecraft:air"); } catch {}
-        const inv = player.getComponent("minecraft:inventory")?.container;
+        const inv = player.getComponent(MinecraftComponentId.Inventory)?.container;
         if (inv) inv.addItem(new ItemStack(ADDON.blocks.survivalChest, 1));
         return;
       }

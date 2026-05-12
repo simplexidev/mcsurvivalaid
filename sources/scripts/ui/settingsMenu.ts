@@ -4,6 +4,7 @@ import { giveStarterItems } from "./firstSpawnForms.js";
 import { logger } from "../logging/logger.js";
 import { showDeveloperMenu } from "./developerMenu.js";
 import { safeShow } from "./safeShow.js";
+import { getBooleanField, getNumberField } from "./formValues.js";
 
 const LOG_LEVELS = ["trace", "info", "warn", "error"];
 
@@ -38,8 +39,15 @@ export async function showSettingsMenu(player) {
     .slider("Teleport Cooldown (sec)", 10, 600, { defaultValue: state.settings.teleportCooldownSeconds });
   const result = await safeShow(form, player, "settingsMenu", "gameplay_settings");
   if (result.canceled || !result.formValues) { logger.trace("settingsMenu", "Gameplay settings canceled", { playerId: player.id }); return; }
-  const [showHud,showDaysSurvived,showDaysUntilReward,showRewardReady,chestChangesTexture,allowTeleportToRespawn,allowTeleportToDeath,teleportCooldownSeconds] = result.formValues;
-  Object.assign(state.settings,{showHud,showDaysSurvived,showDaysUntilReward,showRewardReady,chestChangesTexture,allowTeleportToRespawn,allowTeleportToDeath,teleportCooldownSeconds:Math.floor(teleportCooldownSeconds)});
+  const showHud = getBooleanField(result.formValues, 0, state.settings.showHud);
+  const showDaysSurvived = getBooleanField(result.formValues, 1, state.settings.showDaysSurvived);
+  const showDaysUntilReward = getBooleanField(result.formValues, 2, state.settings.showDaysUntilReward);
+  const showRewardReady = getBooleanField(result.formValues, 3, state.settings.showRewardReady);
+  const chestChangesTexture = getBooleanField(result.formValues, 4, state.settings.chestChangesTexture);
+  const allowTeleportToRespawn = getBooleanField(result.formValues, 5, state.settings.allowTeleportToRespawn);
+  const allowTeleportToDeath = getBooleanField(result.formValues, 6, state.settings.allowTeleportToDeath);
+  const teleportCooldownSeconds = Math.floor(getNumberField(result.formValues, 7, state.settings.teleportCooldownSeconds));
+  Object.assign(state.settings,{showHud,showDaysSurvived,showDaysUntilReward,showRewardReady,chestChangesTexture,allowTeleportToRespawn,allowTeleportToDeath,teleportCooldownSeconds});
   setPlayerState(player,state);
   logger.info("settingsMenu", "Player settings updated", { playerId: player.id, settings: state.settings });
   player.sendMessage("Survival Aid settings updated.");

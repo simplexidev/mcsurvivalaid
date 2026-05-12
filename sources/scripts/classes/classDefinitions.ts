@@ -1,9 +1,15 @@
-export type ClassId = "adventurer" | "warrior" | "miner" | "mage";
+import { CLASSES } from "../constants.js";
+import { ClassId } from "../types/domain.js";
+
+export { ClassId };
+
 export interface ClassDefinition { id: ClassId; name: string; description: string }
-const CLASSES: ClassDefinition[] = [
-  { id: "adventurer", name: "Adventurer", description: "Balanced starter class." },
-  { id: "warrior", name: "Warrior", description: "Combat-focused class." },
-  { id: "miner", name: "Miner", description: "Resource-focused class." },
-  { id: "mage", name: "Mage", description: "Utility-focused class." }
+
+const CLASS_DEFINITIONS: ReadonlyArray<ClassDefinition> = [
+  { id: ClassId.Adventurer, name: CLASSES[ClassId.Adventurer], description: "Balanced starter class." },
+  { id: ClassId.Warrior, name: CLASSES[ClassId.Warrior], description: "Combat-focused class." },
+  { id: ClassId.Miner, name: CLASSES[ClassId.Miner], description: "Resource-focused class." },
+  { id: ClassId.Mage, name: CLASSES[ClassId.Mage], description: "Utility-focused class." }
 ];
-export function getClassList(): ClassDefinition[] { return CLASSES; }
+
+export function getClassList(): ReadonlyArray<ClassDefinition> { return CLASS_DEFINITIONS; }

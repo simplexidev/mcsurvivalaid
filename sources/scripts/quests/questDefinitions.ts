@@ -1,4 +1,6 @@
-export const QUESTS = {
+import type { RewardDefinition } from "../types/domain.js";
+
+export const QUESTS: Readonly<Record<string, Readonly<Record<string, ReadonlyArray<number>>>>> = {
   travel: {
     horizontal_distance: [250, 1000, 3000, 7000, 15000],
     swim_distance: [50, 250, 750, 1500, 3000],
@@ -30,7 +32,7 @@ export const QUESTS = {
   }
 };
 
-export const QUEST_REWARD = [
+export const QUEST_REWARD: ReadonlyArray<RewardDefinition> = [
   { itemId: "minecraft:torch", amount: 16 },
   { itemId: "minecraft:cooked_beef", amount: 6 }
 ];

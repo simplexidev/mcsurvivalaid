@@ -1,32 +1,39 @@
-import { world, system } from "@minecraft/server";
+import { world, system, type Player } from "@minecraft/server";
+import { isPlayer } from "../shared/entityGuards.js";
+import type { CombatMetricKey } from "../types/domain.js";
+import { MinecraftComponentId } from "../types/domain.js";
 import { addQuestProgress } from "./questService.js";
 
-const previousDurability = new Map();
+const previousDurability = new Map<string, Record<string, number>>();
 
-export function registerCombatQuestTracking() {
+function addCombatProgress(player: Player, key: CombatMetricKey, amount: number): void {
+  addQuestProgress(player, "combat", key, amount);
+}
+
+export function registerCombatQuestTracking(): void {
   world.afterEvents.entityDie.subscribe((event) => {
     const source = event.damageSource?.damagingEntity;
     if (!source || source.typeId !== "minecraft:player") return;
     const killed = event.deadEntity;
     const key = isLikelyHostile(killed.typeId) ? "hostile_mobs_killed" : "non_hostile_mobs_killed";
-    addQuestProgress(source, "combat", key, 1);
+    if (isPlayer(source)) addCombatProgress(source, key, 1);
   });
 
   world.afterEvents.entityHurt.subscribe((event) => {
     const hurt = event.hurtEntity;
     const source = event.damageSource?.damagingEntity;
     const damage = event.damage ?? 0;
-    if (hurt?.typeId === "minecraft:player") addQuestProgress(hurt, "combat", "damage_taken", damage);
-    if (source?.typeId === "minecraft:player") addQuestProgress(source, "combat", "damage_dealt", damage);
+    if (isPlayer(hurt)) addCombatProgress(hurt, "damage_taken", damage);
+    if (isPlayer(source)) addCombatProgress(source, "damage_dealt", damage);
   });
 
   // Best-effort crafting/smelting events, availability depends on Bedrock API/runtime.
   (world.afterEvents as any).playerCraftedItem?.subscribe((event) => {
-    if (isGear(event.itemStack?.typeId)) addQuestProgress(event.player, "combat", "gear_crafted", 1);
+    if (isGear(event.itemStack?.typeId)) addCombatProgress(event.player, "gear_crafted", 1);
   });
 
   (world.afterEvents as any).itemSmelted?.subscribe((event) => {
-    if (isGear(event.itemStack?.typeId)) addQuestProgress(event.player, "combat", "gear_smelted", 1);
+    if (isGear(event.itemStack?.typeId)) addCombatProgress(event.player, "gear_smelted", 1);
   });
 
   system.runInterval(() => {
@@ -34,11 +41,11 @@ export function registerCombatQuestTracking() {
   }, 20);
 }
 
-function trackBrokenGearApprox(player) {
-  const inv = player.getComponent("minecraft:inventory")?.container;
+function trackBrokenGearApprox(player: Player): void {
+  const inv = player.getComponent(MinecraftComponentId.Inventory)?.container;
   if (!inv) return;
   const prev = previousDurability.get(player.id) ?? {};
-  const next = {};
+  const next: Record<string, number> = {};
 
   for (let i = 0; i < inv.size; i++) {
     const item = inv.getItem(i);
@@ -50,17 +57,17 @@ function trackBrokenGearApprox(player) {
 
   // If tracked gear disappears from same slot key, count as break approximation.
   for (const key of Object.keys(prev)) {
-    if (!(key in next)) addQuestProgress(player, "combat", "gear_broken", 1);
+    if (!(key in next)) addCombatProgress(player, "gear_broken", 1);
   }
 
   previousDurability.set(player.id, next);
 }
 
-function isGear(typeId) {
+function isGear(typeId: string | undefined): boolean {
   if (!typeId) return false;
   return typeId.includes("sword") || typeId.includes("axe") || typeId.includes("pickaxe") || typeId.includes("helmet") || typeId.includes("chestplate") || typeId.includes("leggings") || typeId.includes("boots") || typeId.includes("shield");
 }
 
-function isLikelyHostile(typeId) {
+function isLikelyHostile(typeId: string): boolean {
   return ["minecraft:zombie","minecraft:skeleton","minecraft:creeper","minecraft:spider","minecraft:enderman","minecraft:witch","minecraft:pillager","minecraft:vindicator","minecraft:evocation_illager","minecraft:slime","minecraft:magma_cube","minecraft:blaze","minecraft:ghast","minecraft:guardian","minecraft:elder_guardian","minecraft:drowned","minecraft:husk","minecraft:stray","minecraft:warden"].includes(typeId);
 }
