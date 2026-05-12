@@ -1,8 +1,11 @@
-export const STORAGE_KEYS = {
-  playerStatePrefix: "survival_aid:survival_aid:player:",
-  worldState: "survival_aid:survival_aid:world"
-};
+import type { Player } from "@minecraft/server";
+import { StorageKey } from "../types/domain.js";
 
-export function getPlayerStateKey(player) {
+export const STORAGE_KEYS = {
+  playerStatePrefix: StorageKey.PlayerStatePrefix,
+  worldState: StorageKey.WorldState
+} as const;
+
+export function getPlayerStateKey(player: Player): string {
   return `${STORAGE_KEYS.playerStatePrefix}${player.id}`;
 }
