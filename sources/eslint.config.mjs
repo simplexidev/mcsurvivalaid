@@ -4,22 +4,22 @@ import tsParser from "@typescript-eslint/parser";
 
 export default [
   {
-    ignores: ["behaviors/scripts/**", "behaviors/**/*.json", "resources/**", "node_modules/**"]
+    ignores: ["behaviors/scripts/**", "behaviors/**/*.json", "resources/**", "node_modules/**"],
   },
   {
     files: ["scripts/**/*.ts"],
     languageOptions: {
       parser: tsParser,
       ecmaVersion: "latest",
-      sourceType: "module"
+      sourceType: "module",
     },
     plugins: {
       "@typescript-eslint": ts,
-      "minecraft-linting": minecraftLinting
+      "minecraft-linting": minecraftLinting,
     },
     rules: {
       "minecraft-linting/avoid-unnecessary-command": "warn",
-      "@typescript-eslint/no-explicit-any": "off"
-    }
-  }
+      "@typescript-eslint/no-explicit-any": "off",
+    },
+  },
 ];

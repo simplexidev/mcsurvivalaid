@@ -6,7 +6,7 @@ const LOG_LEVELS = Object.freeze({
   trace: 10,
   info: 20,
   warn: 30,
-  error: 40
+  error: 40,
 });
 
 const DEFAULT_LEVEL = "info";
@@ -14,7 +14,7 @@ const DEFAULT_LEVEL = "info";
 const PROPERTIES = Object.freeze({
   logLevel: "survivalaid:logLevel",
   traceSampleRate: "survivalaid:traceSampleRate",
-  traceMinIntervalTicks: "survivalaid:traceMinIntervalTicks"
+  traceMinIntervalTicks: "survivalaid:traceMinIntervalTicks",
 });
 
 const DEFAULT_TRACE_SAMPLE_RATE = 20;
@@ -53,12 +53,9 @@ function warnDynamicPropertiesUnavailable(error) {
   warnedDynamicPropertiesUnavailable = true;
 
   console.warn(
-    formatLine(
-      "warn",
-      "logger",
-      "Dynamic properties unavailable yet; using cached/default logger configuration.",
-      { error: String(error) }
-    )
+    formatLine("warn", "logger", "Dynamic properties unavailable yet; using cached/default logger configuration.", {
+      error: String(error),
+    })
   );
 }
 
@@ -149,7 +146,7 @@ function safeJson(value) {
   try {
     return JSON.stringify(value);
   } catch {
-    return "{\"error\":\"context_serialization_failed\"}";
+    return '{"error":"context_serialization_failed"}';
   }
 }
 
@@ -206,5 +203,5 @@ export const logger = {
     }
 
     return value;
-  }
+  },
 };

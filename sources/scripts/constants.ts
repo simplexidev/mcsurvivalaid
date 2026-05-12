@@ -8,15 +8,15 @@ export const ADDON = {
   items: { bookOfSurvival: "survival_aid:book_of_survival" },
   components: {
     survivalChest: "survival_aid:survival_aid_chest_component",
-    bookOfSurvival: "survival_aid:book_of_survival_component"
-  }
+    bookOfSurvival: "survival_aid:book_of_survival_component",
+  },
 } as const;
 
 export const CLASSES: Readonly<Record<ClassId, string>> = {
   [ClassId.Adventurer]: "Adventurer",
   [ClassId.Warrior]: "Warrior",
   [ClassId.Miner]: "Miner",
-  [ClassId.Mage]: "Mage"
+  [ClassId.Mage]: "Mage",
 };
 
 export const CLASS_REWARD_DAYS: ReadonlyArray<number> = [3, 7, 10, 15, 20];

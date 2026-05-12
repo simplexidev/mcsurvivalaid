@@ -67,7 +67,11 @@ export function updateHudForAllPlayers() {
     const worldDay = getCurrentWorldDay();
     const daysSurvived = Math.max(0, worldDay - state.classTrack.lastDeathDay);
     const classTrackDays = Math.max(0, worldDay - state.classTrack.classTrackStartDay);
-    const nextRewardDay = getNextClassRewardDay(classTrackDays, state.classTrack.claimedClassRewardDays, state.classTrack.pendingClassRewardDays);
+    const nextRewardDay = getNextClassRewardDay(
+      classTrackDays,
+      state.classTrack.claimedClassRewardDays,
+      state.classTrack.pendingClassRewardDays
+    );
     const rewardReady = hasPendingRewards(player);
 
     const parts = [];

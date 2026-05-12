@@ -53,9 +53,7 @@ export async function showDeveloperMenu(player) {
 }
 
 async function showSkipDaysMenu(player) {
-  const form = new ModalFormData()
-    .title("Skip Days")
-    .slider("Days to skip", 1, 365, { defaultValue: 1 });
+  const form = new ModalFormData().title("Skip Days").slider("Days to skip", 1, 365, { defaultValue: 1 });
 
   const result = await safeShow(form, player, "developerMenu", "skip_days");
   if (result.canceled || !result.formValues) {
@@ -88,7 +86,13 @@ async function setRespawnHere(player) {
     state.deaths.respawnLocation = { dimension: player.dimension.id, x, y, z };
     setPlayerState(player, state);
     player.sendMessage(`Developer: respawn point set to ${x}, ${y}, ${z}.`);
-    logger.info("developerMenu", "Developer set respawn point", { playerId: player.id, dimension: player.dimension.id, x, y, z });
+    logger.info("developerMenu", "Developer set respawn point", {
+      playerId: player.id,
+      dimension: player.dimension.id,
+      x,
+      y,
+      z,
+    });
   } catch (error) {
     player.sendMessage("Developer: failed to set respawn point.");
     logger.error("developerMenu", "Set respawn point failed", { playerId: player.id, x, y, z, error: String(error) });
@@ -98,7 +102,10 @@ async function setRespawnHere(player) {
 async function killPlayerInstantly(player) {
   try {
     await runCommand(player.dimension, `execute as ${playerSelector(player)} run kill @s`);
-    logger.warn("developerMenu", "Developer used instant kill", { playerId: player.id, dimension: player.dimension.id });
+    logger.warn("developerMenu", "Developer used instant kill", {
+      playerId: player.id,
+      dimension: player.dimension.id,
+    });
   } catch (error) {
     player.sendMessage("Developer: failed to kill player.");
     logger.error("developerMenu", "Instant kill failed", { playerId: player.id, error: String(error) });

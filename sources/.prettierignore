@@ -1,4 +1,23 @@
+# Generated script output
 behaviors/scripts/**/*.js
 behaviors/scripts/**/*.js.map
 behaviors/scripts/**/*.d.ts
-node_modules
+
+# Dependencies and caches
+node_modules/
+.npm/
+
+# Build/distribution artifacts
+*.zip
+*.mcaddon
+*.mcpack
+*.tgz
+
+# Binary and media assets
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.tga
+*.mcstructure

@@ -12,14 +12,26 @@ const activeInitialPrompts = new Set();
 
 export async function handleInitialSpawn(player) {
   logger.trace("firstSpawn", "handleInitialSpawn invoked", { playerId: player.id });
-  if (activeInitialPrompts.has(player.id)) { logger.trace("firstSpawn", "Prompt already active", { playerId: player.id }); return; }
+  if (activeInitialPrompts.has(player.id)) {
+    logger.trace("firstSpawn", "Prompt already active", { playerId: player.id });
+    return;
+  }
 
   const state = getPlayerState(player);
-  if (state.hasSeenInitialPrompt) { logger.trace("firstSpawn", "Initial prompt already seen", { playerId: player.id }); return; }
+  if (state.hasSeenInitialPrompt) {
+    logger.trace("firstSpawn", "Initial prompt already seen", { playerId: player.id });
+    return;
+  }
 
   activeInitialPrompts.add(player.id);
 
-  const enableForm = new MessageFormData().title("Survival Aid Add-On").body("This world allows for world-based quests, daily rewards, and other helpful survival utilities. Would you like to enable these features?").button1("Enable").button2("Disable");
+  const enableForm = new MessageFormData()
+    .title("Survival Aid Add-On")
+    .body(
+      "This world allows for world-based quests, daily rewards, and other helpful survival utilities. Would you like to enable these features?"
+    )
+    .button1("Enable")
+    .button2("Disable");
   const enableResult = await showRequiredMessageForm(player, enableForm, "initial_enable");
 
   if (enableResult.selection !== 0) {
@@ -41,7 +53,8 @@ async function showClassSelection(player) {
   logger.trace("firstSpawn", "Showing class selection", { playerId: player.id, classCount: classes.length });
   while (true) {
     const form = new ActionFormData().title("Choose Your Class").body("Pick your first Survival Aid class.");
-    for (const c of classes) form.button(`${c.name}
+    for (const c of classes)
+      form.button(`${c.name}
 ${c.description}`);
     const result = await showRequiredActionForm(player, form, "class_selection");
     if (result.selection !== undefined) {
@@ -53,7 +66,15 @@ ${c.description}`);
       return;
     }
     logger.warn("firstSpawn", "Class selection returned invalid result", { playerId: player.id, result });
-    const retry = await showRequiredMessageForm(player, new MessageFormData().title("Class Selection Required").body("You must pick a class to enable Survival Aid now. Continue selecting?").button1("Continue").button2("Disable Survival Aid"), "class_selection_retry");
+    const retry = await showRequiredMessageForm(
+      player,
+      new MessageFormData()
+        .title("Class Selection Required")
+        .body("You must pick a class to enable Survival Aid now. Continue selecting?")
+        .button1("Continue")
+        .button2("Disable Survival Aid"),
+      "class_selection_retry"
+    );
     if (retry.canceled || retry.selection !== 0) {
       const state = getPlayerState(player);
       state.hasSeenInitialPrompt = true;
@@ -100,13 +121,19 @@ function waitTicks(ticks) {
 
 export function giveStarterItems(player) {
   const inventory = player.getComponent(MinecraftComponentId.Inventory)?.container;
-  if (!inventory) { logger.warn("firstSpawn", "No inventory container for starter items", { playerId: player.id }); return; }
+  if (!inventory) {
+    logger.warn("firstSpawn", "No inventory container for starter items", { playerId: player.id });
+    return;
+  }
   ensureOneItem(inventory, ADDON.blocks.survivalChest);
   ensureOneItem(inventory, ADDON.items.bookOfSurvival);
 }
 
 function ensureOneItem(container, itemId) {
-  if (countItem(container, itemId) > 0) { logger.trace("firstSpawn", "Starter item already present", { itemId }); return; }
+  if (countItem(container, itemId) > 0) {
+    logger.trace("firstSpawn", "Starter item already present", { itemId });
+    return;
+  }
   try {
     container.addItem(new ItemStack(itemId, 1));
     logger.trace("firstSpawn", "Starter item granted", { itemId });
