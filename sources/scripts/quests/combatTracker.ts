@@ -1,5 +1,7 @@
 import { world, system, type Player } from "@minecraft/server";
+import { isPlayer } from "../shared/entityGuards.js";
 import type { CombatMetricKey } from "../types/domain.js";
+import { MinecraftComponentId } from "../types/domain.js";
 import { addQuestProgress } from "./questService.js";
 
 const previousDurability = new Map<string, Record<string, number>>();
@@ -14,15 +16,15 @@ export function registerCombatQuestTracking(): void {
     if (!source || source.typeId !== "minecraft:player") return;
     const killed = event.deadEntity;
     const key = isLikelyHostile(killed.typeId) ? "hostile_mobs_killed" : "non_hostile_mobs_killed";
-    if (source.typeId === "minecraft:player") addCombatProgress(source as Player, key, 1);
+    if (isPlayer(source)) addCombatProgress(source, key, 1);
   });
 
   world.afterEvents.entityHurt.subscribe((event) => {
     const hurt = event.hurtEntity;
     const source = event.damageSource?.damagingEntity;
     const damage = event.damage ?? 0;
-    if (hurt?.typeId === "minecraft:player") addCombatProgress(hurt as Player, "damage_taken", damage);
-    if (source?.typeId === "minecraft:player") addCombatProgress(source as Player, "damage_dealt", damage);
+    if (isPlayer(hurt)) addCombatProgress(hurt, "damage_taken", damage);
+    if (isPlayer(source)) addCombatProgress(source, "damage_dealt", damage);
   });
 
   // Best-effort crafting/smelting events, availability depends on Bedrock API/runtime.
@@ -40,7 +42,7 @@ export function registerCombatQuestTracking(): void {
 }
 
 function trackBrokenGearApprox(player: Player): void {
-  const inv = player.getComponent("minecraft:inventory")?.container;
+  const inv = player.getComponent(MinecraftComponentId.Inventory)?.container;
   if (!inv) return;
   const prev = previousDurability.get(player.id) ?? {};
   const next: Record<string, number> = {};

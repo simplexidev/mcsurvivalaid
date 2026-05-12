@@ -3,6 +3,7 @@ import { world } from "@minecraft/server";
 import { logger } from "../logging/logger.js";
 import { getPlayerState, setPlayerState } from "../state/playerState.js";
 import { safeShow } from "./safeShow.js";
+import { getNumberField } from "./formValues.js";
 
 function getCommandRunner(target) {
   if (typeof target?.runCommandAsync === "function") {
@@ -62,7 +63,7 @@ async function showSkipDaysMenu(player) {
     return;
   }
 
-  const days = Math.max(1, Math.floor(Number(result.formValues[0]) || 1));
+  const days = Math.max(1, Math.floor(getNumberField(result.formValues, 0, 1)));
   const ticks = days * 24000;
 
   try {

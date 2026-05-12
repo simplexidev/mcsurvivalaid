@@ -3,6 +3,7 @@ import { system, type Player } from "@minecraft/server";
 import { getPlayerState, setPlayerState } from "../state/playerState.js";
 import { logger } from "../logging/logger.js";
 import { safeShow } from "../ui/safeShow.js";
+import { getNumberField } from "../ui/formValues.js";
 import type { ItemRequest, PlayerState } from "../types/domain.js";
 
 const REQUESTABLE_ITEMS: ReadonlyArray<string> = ["coal","raw_iron","raw_copper","raw_gold","redstone","lapis_lazuli","oak_log","spruce_log","birch_log","cobblestone","sand","gravel","clay_ball","wheat_seeds","sugar_cane"];
@@ -22,7 +23,7 @@ export async function showItemRequestsMenu(player: Player): Promise<void> {
   const qtyForm = new ModalFormData().title("Request Quantity").slider("Quantity", 1, 64, { defaultValue: 1 });
   const qtyResult = await safeShow(qtyForm, player, "requestService", "quantity");
   if (qtyResult.canceled || !qtyResult.formValues) { logger.trace("requestService", "Request quantity canceled", { playerId: player.id }); return; }
-  queueItemRequest(player, itemId, Math.floor(Number(qtyResult.formValues[0])));
+  queueItemRequest(player, itemId, Math.floor(getNumberField(qtyResult.formValues, 0, 1)));
 }
 
 function showActiveRequests(player: Player): void {

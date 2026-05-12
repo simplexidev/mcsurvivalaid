@@ -7,6 +7,11 @@ export enum ClassId {
   Mage = "mage"
 }
 
+export enum MinecraftComponentId {
+  Riding = "minecraft:riding",
+  Inventory = "minecraft:inventory"
+}
+
 export enum StorageKey {
   PlayerStatePrefix = "survival_aid:survival_aid:player:",
   WorldState = "survival_aid:survival_aid:world"

@@ -5,6 +5,7 @@ import { getPlayerState, setPlayerState } from "../state/playerState.js";
 import { collectReadyItemRequests } from "../items/requestService.js";
 import { maybePromptClassChange } from "../classes/classService.js";
 import { logger } from "../logging/logger.js";
+import { MinecraftComponentId } from "../types/domain.js";
 
 export function tickRewardService() {
   logger.trace("rewardService", "Tick reward service", { tick: system.currentTick, players: world.getPlayers().length });
@@ -126,7 +127,7 @@ function grantRewardBundle(player, rewards) {
 
 function giveOrDrop(player, itemId, amount) {
   try {
-    const inv = player.getComponent("minecraft:inventory")?.container;
+    const inv = player.getComponent(MinecraftComponentId.Inventory)?.container;
     const stack = new ItemStack(itemId, amount);
     if (inv) {
       const leftover = inv.addItem(stack);

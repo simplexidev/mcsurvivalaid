@@ -1,5 +1,6 @@
 import { world } from "@minecraft/server";
 import type { TravelMetricKey } from "../types/domain.js";
+import { MinecraftComponentId } from "../types/domain.js";
 import { addQuestProgress } from "./questService.js";
 
 interface TravelPositionSnapshot { x: number; y: number; z: number; dimensionId: string; wasRidingBoat: boolean; wasGliding: boolean }
@@ -41,7 +42,7 @@ export function tickTravelTracking(): void {
         addTravelProgress(player, "glide_distance", horizontalDistance);
       }
 
-      const riding = player.getComponent("minecraft:riding")?.entityRidingOn;
+      const riding = player.getComponent(MinecraftComponentId.Riding)?.entityRidingOn;
       const isBoatNow = riding?.typeId === "minecraft:boat";
       const wasBoat = previous.wasRidingBoat === true;
       if (isBoatNow && horizontalDistance > 0.01 && horizontalDistance < 30 && (wasBoat || horizontalDistance < 8)) {
@@ -57,7 +58,7 @@ export function tickTravelTracking(): void {
       }
     }
 
-    const ridingNow = player.getComponent("minecraft:riding")?.entityRidingOn;
+    const ridingNow = player.getComponent(MinecraftComponentId.Riding)?.entityRidingOn;
     lastPositions.set(player.id, { x: current.x, y: current.y, z: current.z, dimensionId: player.dimension.id, wasRidingBoat: ridingNow?.typeId === "minecraft:boat", wasGliding: player.isGliding === true });
   }
 }
