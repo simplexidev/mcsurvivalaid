@@ -1,8 +1,11 @@
-export const STORAGE_KEYS = {
-  playerStatePrefix: "survival_aid:survival_aid:player:",
-  worldState: "survival_aid:survival_aid:world"
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.STORAGE_KEYS = void 0;
+exports.getPlayerStateKey = getPlayerStateKey;
+exports.STORAGE_KEYS = {
+    playerStatePrefix: "survival_aid:survival_aid:player:",
+    worldState: "survival_aid:survival_aid:world"
 };
-
-export function getPlayerStateKey(player) {
-  return `${STORAGE_KEYS.playerStatePrefix}${player.id}`;
+function getPlayerStateKey(player) {
+    return `${exports.STORAGE_KEYS.playerStatePrefix}${player.id}`;
 }
