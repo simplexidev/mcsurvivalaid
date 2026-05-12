@@ -39,7 +39,7 @@ export async function showSettingsMenu(player) {
   const result = await safeShow(form, player, "settingsMenu", "gameplay_settings");
   if (result.canceled || !result.formValues) { logger.trace("settingsMenu", "Gameplay settings canceled", { playerId: player.id }); return; }
   const [showHud,showDaysSurvived,showDaysUntilReward,showRewardReady,chestChangesTexture,allowTeleportToRespawn,allowTeleportToDeath,teleportCooldownSeconds] = result.formValues;
-  Object.assign(state.settings,{showHud,showDaysSurvived,showDaysUntilReward,showRewardReady,chestChangesTexture,allowTeleportToRespawn,allowTeleportToDeath,teleportCooldownSeconds:Math.floor(teleportCooldownSeconds)});
+  Object.assign(state.settings,{showHud,showDaysSurvived,showDaysUntilReward,showRewardReady,chestChangesTexture,allowTeleportToRespawn,allowTeleportToDeath,teleportCooldownSeconds:Math.floor(Number(teleportCooldownSeconds))});
   setPlayerState(player,state);
   logger.info("settingsMenu", "Player settings updated", { playerId: player.id, settings: state.settings });
   player.sendMessage("Survival Aid settings updated.");

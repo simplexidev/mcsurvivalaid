@@ -22,7 +22,7 @@ export async function showItemRequestsMenu(player: Player): Promise<void> {
   const qtyForm = new ModalFormData().title("Request Quantity").slider("Quantity", 1, 64, { defaultValue: 1 });
   const qtyResult = await safeShow(qtyForm, player, "requestService", "quantity");
   if (qtyResult.canceled || !qtyResult.formValues) { logger.trace("requestService", "Request quantity canceled", { playerId: player.id }); return; }
-  queueItemRequest(player, itemId, Math.floor(qtyResult.formValues[0]));
+  queueItemRequest(player, itemId, Math.floor(Number(qtyResult.formValues[0])));
 }
 
 function showActiveRequests(player: Player): void {

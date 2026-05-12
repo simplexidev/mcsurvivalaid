@@ -1,9 +1,16 @@
 import { world } from "@minecraft/server";
+import type { TravelMetricKey } from "../types/domain.js";
 import { addQuestProgress } from "./questService.js";
 
-const lastPositions = new Map();
+interface TravelPositionSnapshot { x: number; y: number; z: number; dimensionId: string; wasRidingBoat: boolean; wasGliding: boolean }
 
-export function tickTravelTracking() {
+const lastPositions = new Map<string, TravelPositionSnapshot>();
+
+function addTravelProgress(player, key: TravelMetricKey, amount: number): void {
+  addQuestProgress(player, "travel", key, amount);
+}
+
+export function tickTravelTracking(): void {
   for (const player of world.getPlayers()) {
     const previous = lastPositions.get(player.id);
     const current = player.location;
@@ -21,32 +28,32 @@ export function tickTravelTracking() {
       }
 
       if (horizontalDistance > 0.01 && horizontalDistance < 20) {
-        addQuestProgress(player, "travel", "horizontal_distance", horizontalDistance);
+        addTravelProgress(player, "horizontal_distance", horizontalDistance);
       }
 
       if (player.isSwimming && horizontalDistance > 0.01 && horizontalDistance < 20) {
-        addQuestProgress(player, "travel", "swim_distance", horizontalDistance);
+        addTravelProgress(player, "swim_distance", horizontalDistance);
       }
 
       const isGlidingNow = player.isGliding === true;
       const wasGliding = previous.wasGliding === true;
       if (isGlidingNow && horizontalDistance > 0.01 && horizontalDistance < 60 && (wasGliding || horizontalDistance < 20)) {
-        addQuestProgress(player, "travel", "glide_distance", horizontalDistance);
+        addTravelProgress(player, "glide_distance", horizontalDistance);
       }
 
       const riding = player.getComponent("minecraft:riding")?.entityRidingOn;
       const isBoatNow = riding?.typeId === "minecraft:boat";
       const wasBoat = previous.wasRidingBoat === true;
       if (isBoatNow && horizontalDistance > 0.01 && horizontalDistance < 30 && (wasBoat || horizontalDistance < 8)) {
-        addQuestProgress(player, "travel", "boat_distance", horizontalDistance);
+        addTravelProgress(player, "boat_distance", horizontalDistance);
       }
 
       if (dy > 0.42 && dy < 3) {
-        addQuestProgress(player, "travel", "jump_count", 1);
+        addTravelProgress(player, "jump_count", 1);
       }
 
       if (dy < -2 && Math.abs(dy) < 40) {
-        addQuestProgress(player, "travel", "fall_distance", Math.abs(dy));
+        addTravelProgress(player, "fall_distance", Math.abs(dy));
       }
     }
 
