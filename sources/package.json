@@ -9,5 +9,10 @@
     "@minecraft/server": "^2.7.0",
     "@minecraft/server-ui": "^2.0.0",
     "@minecraft/vanilla-data": "^1.26.20"
+  },
+  "scripts": {
+    "clean": "node -e \"const fs=require(\\\"fs\\\");const p=\\\"behaviors/scripts\\\";if(fs.existsSync(p)){fs.rmSync(p,{recursive:true,force:true});}fs.mkdirSync(p,{recursive:true});\"",
+    "build": "npm run clean && tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
   }
 }

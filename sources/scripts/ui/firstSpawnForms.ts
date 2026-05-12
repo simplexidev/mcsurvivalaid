@@ -92,8 +92,8 @@ async function showRequiredActionForm(player, form, flow) {
 }
 
 function waitTicks(ticks) {
-  return new Promise((resolve) => {
-    system.runTimeout(resolve, ticks);
+  return new Promise<void>((resolve) => {
+    system.runTimeout(() => resolve(), ticks);
   });
 }
 

@@ -46,7 +46,7 @@ export function hasPendingRewards(player) {
   return state.classTrack.pendingClassRewardDays.length > 0 || state.quests.pendingQuestRewards.length > 0 || state.requests.active.some(r => !r.claimed && r.readyAtTick <= system.currentTick);
 }
 
-export function claimPendingRewards(player, options = {}) {
+export function claimPendingRewards(player, options: { includeClassAndQuestRewards?: boolean } = {}) {
   const { includeClassAndQuestRewards = true } = options;
   const state = getPlayerState(player);
   let grantedAny = false;

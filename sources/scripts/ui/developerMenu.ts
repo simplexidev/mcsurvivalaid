@@ -54,7 +54,7 @@ export async function showDeveloperMenu(player) {
 async function showSkipDaysMenu(player) {
   const form = new ModalFormData()
     .title("Skip Days")
-    .slider("Days to skip", 1, 365, { step: 1, defaultValue: 1 });
+    .slider("Days to skip", 1, 365, { defaultValue: 1 });
 
   const result = await safeShow(form, player, "developerMenu", "skip_days");
   if (result.canceled || !result.formValues) {

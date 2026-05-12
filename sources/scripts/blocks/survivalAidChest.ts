@@ -51,6 +51,7 @@ export function registerSurvivalChestComponent(event) {
 }
 
 export function handleSurvivalChestInteract(player, block) {
+  const state = getPlayerState(player);
   const own = state.chest.location;
   const b = block.location;
   const isOwnChest = !!own && own.dimension === block.dimension.id && own.x === b.x && own.y === b.y && own.z === b.z;

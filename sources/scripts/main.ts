@@ -67,6 +67,6 @@ function runCompatibilityProbe() {
   if (failed.length > 0) {
     logger.warn("main", "Compatibility probe failed", { failed });
   } else {
-    logger.info("main", "Compatibility probe passed for required API surfaces.");
+    logger.info("main", "Compatibility probe passed for required API surfaces.", {});
   }
 }

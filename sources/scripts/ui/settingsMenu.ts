@@ -35,7 +35,7 @@ export async function showSettingsMenu(player) {
     .toggle("Chest Changes Texture", { defaultValue: state.settings.chestChangesTexture })
     .toggle("Allow Teleport to Respawn", { defaultValue: state.settings.allowTeleportToRespawn })
     .toggle("Allow Teleport to Last Death", { defaultValue: state.settings.allowTeleportToDeath })
-    .slider("Teleport Cooldown (sec)", 10, 600, { step: 10, defaultValue: state.settings.teleportCooldownSeconds });
+    .slider("Teleport Cooldown (sec)", 10, 600, { defaultValue: state.settings.teleportCooldownSeconds });
   const result = await safeShow(form, player, "settingsMenu", "gameplay_settings");
   if (result.canceled || !result.formValues) { logger.trace("settingsMenu", "Gameplay settings canceled", { playerId: player.id }); return; }
   const [showHud,showDaysSurvived,showDaysUntilReward,showRewardReady,chestChangesTexture,allowTeleportToRespawn,allowTeleportToDeath,teleportCooldownSeconds] = result.formValues;

@@ -21,11 +21,11 @@ export function registerCombatQuestTracking() {
   });
 
   // Best-effort crafting/smelting events, availability depends on Bedrock API/runtime.
-  world.afterEvents.playerCraftedItem?.subscribe((event) => {
+  (world.afterEvents as any).playerCraftedItem?.subscribe((event) => {
     if (isGear(event.itemStack?.typeId)) addQuestProgress(event.player, "combat", "gear_crafted", 1);
   });
 
-  world.afterEvents.itemSmelted?.subscribe((event) => {
+  (world.afterEvents as any).itemSmelted?.subscribe((event) => {
     if (isGear(event.itemStack?.typeId)) addQuestProgress(event.player, "combat", "gear_smelted", 1);
   });
 

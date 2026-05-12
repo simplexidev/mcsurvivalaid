@@ -16,7 +16,7 @@ export function createDefaultWorldState() {
 
 export function getWorldState() {
   const raw = world.getDynamicProperty(STORAGE_KEYS.worldState);
-  if (typeof raw !== "string" || raw.length === 0) { logger.info("worldState", "No world state found; creating default state"); return createDefaultWorldState(); }
+  if (typeof raw !== "string" || raw.length === 0) { logger.info("worldState", "No world state found; creating default state", {}); return createDefaultWorldState(); }
   try {
     const parsed = JSON.parse(raw);
     return migrateWorldState({ ...createDefaultWorldState(), ...parsed, knownStructures: { ...(parsed.knownStructures ?? {}) } });
@@ -53,7 +53,7 @@ function normalizeKnownStructures(knownStructures) {
   const out = {};
   for (const [type, entries] of Object.entries(knownStructures)) {
     const seen = new Set();
-    out[type] = (entries ?? [])
+    out[type] = ((entries ?? []) as any[])
       .filter(Boolean)
       .map(e => ({ dimension: e.dimension, x: Math.floor(e.x), y: Math.floor(e.y), z: Math.floor(e.z), tick: Number(e.tick ?? 0) }))
       .filter(e => {
