@@ -16,6 +16,9 @@
     "scripts/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "behaviors/scripts/**",
+    "behaviors/**/*.json",
+    "resources/**"
   ]
 }

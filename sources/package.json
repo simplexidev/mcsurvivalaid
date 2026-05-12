@@ -10,9 +10,22 @@
     "@minecraft/server-ui": "^2.0.0",
     "@minecraft/vanilla-data": "^1.26.20"
   },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.33.1",
+    "@typescript-eslint/parser": "^8.33.1",
+    "eslint": "^9.28.0",
+    "eslint-plugin-minecraft-linting": "^1.2.1",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.3"
+  },
   "scripts": {
-    "clean": "node -e \"const fs=require(\\\"fs\\\");const p=\\\"behaviors/scripts\\\";if(fs.existsSync(p)){fs.rmSync(p,{recursive:true,force:true});}fs.mkdirSync(p,{recursive:true});\"",
-    "build": "npm run clean && tsc -p tsconfig.json",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "clean": "node -e \"const fs=require('fs');const path=require('path');const root='behaviors/scripts';const exts=new Set(['.js','.js.map','.d.ts']);const walk=(d)=>{if(!fs.existsSync(d))return;for(const e of fs.readdirSync(d,{withFileTypes:true})){const p=path.join(d,e.name);if(e.isDirectory())walk(p);else if(exts.has(e.name.endsWith('.d.ts')?'.d.ts':path.extname(e.name)))fs.rmSync(p,{force:true});}};walk(root);\"",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "rebuild": "npm run clean && npm run build",
+    "lint": "eslint scripts --ext .ts",
+    "format": "prettier --write \"scripts/**/*.ts\" \"*.{json,mjs,ts}\"",
+    "format:check": "prettier --check \"scripts/**/*.ts\" \"*.{json,mjs,ts}\"",
+    "deploy": "deploy.cmd"
   }
 }
