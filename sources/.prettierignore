@@ -1,0 +1,4 @@
+behaviors/scripts/**/*.js
+behaviors/scripts/**/*.js.map
+behaviors/scripts/**/*.d.ts
+node_modules
