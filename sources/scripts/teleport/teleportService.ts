@@ -1,25 +1,28 @@
-import { world, system } from "@minecraft/server";
+import { world, system, type Dimension, type Entity, type EntityDieAfterEvent, type Player, type Vector3 } from "@minecraft/server";
 import { getPlayerState, setPlayerState } from "../state/playerState.js";
 import { logger } from "../logging/logger.js";
 import { getCurrentWorldDay } from "../rewards/rewardService.js";
+import type { CooldownKey, SavedTeleportPoint, TeleportResult } from "../types/domain.js";
 
 //TODO: Implement and incorporate these. Locations should be named, and will be available to be added by the player via the book. initial spawn, respawn point and death locations will have the names "Initial Spawn", "Respawn", and "Last Death" respectively.
-export function registerTeleportLocation(player, name, dimension, x, y, z) {
+export function registerTeleportLocation(player: Player, name: string, dimension: string, x: number, y: number, z: number): boolean {
   // TODO: named teleport registry is intentionally not implemented yet.
   return false;
 }
-export function removeTeleportLocation(player, name) {
+export function removeTeleportLocation(player: Player, name: string): boolean {
   // TODO: named teleport registry is intentionally not implemented yet.
   return false;
 }
-export function teleportPlayer(player, name) {
+export function teleportPlayer(player: Player, name: string): boolean {
   // TODO: named teleport registry is intentionally not implemented yet.
   return false;
 }
 
-export function handlePlayerDeath(event) {
+function isPlayer(entity: Entity): entity is Player { return entity.typeId === "minecraft:player"; }
+
+export function handlePlayerDeath(event: EntityDieAfterEvent): void {
   const dead = event.deadEntity;
-  if (!dead || dead.typeId !== "minecraft:player") return;
+  if (!dead || !isPlayer(dead)) return;
   logger.info("teleportService", "Player death captured", { playerId: dead.id, dimension: dead.dimension.id });
   const state = getPlayerState(dead);
   const location = dead.location;
@@ -31,7 +34,7 @@ export function handlePlayerDeath(event) {
   setPlayerState(dead, state);
 }
 
-function canUseCooldown(player, key) {
+function canUseCooldown(player: Player, key: CooldownKey): boolean {
   const state = getPlayerState(player);
   if (system.currentTick < state.cooldowns[key]) {
     const remain = Math.ceil((state.cooldowns[key] - system.currentTick) / 20);
@@ -44,7 +47,7 @@ function canUseCooldown(player, key) {
   return true;
 }
 
-export function teleportToRespawn(player) {
+export function teleportToRespawn(player: Player): void {
   const state = getPlayerState(player);
   if (!state.settings.allowTeleportToRespawn) return player.sendMessage("Teleport to Respawn is disabled.");
   if (!canUseCooldown(player, "respawnTeleportReadyTick")) return;
@@ -52,7 +55,7 @@ export function teleportToRespawn(player) {
     const spawn = player.getSpawnPoint?.() ?? null;
     const savedRespawn = state.deaths.respawnLocation ?? null;
     const target = spawn ?? savedRespawn ?? { dimension: player.dimension.id, ...world.getDefaultSpawnLocation() };
-    const dimension = target.dimension ? world.getDimension(target.dimension) : player.dimension;
+    const dimension = typeof target.dimension === "string" ? world.getDimension(target.dimension) : player.dimension;
     const safe = resolveSafeTarget(dimension, target.x + 0.5, target.y + 1, target.z + 0.5);
     if (!safe) return player.sendMessage("No safe respawn-adjacent position found.");
     player.teleport(safe, { dimension });
@@ -64,14 +67,14 @@ export function teleportToRespawn(player) {
   }
 }
 
-export function teleportToLastDeath(player) {
+export function teleportToLastDeath(player: Player): void {
   const state = getPlayerState(player);
   if (!state.settings.allowTeleportToDeath) return player.sendMessage("Teleport to Last Death is disabled.");
   if (!canUseCooldown(player, "deathTeleportReadyTick")) return;
   const lastDeath = state.deaths.lastDeathLocation;
   if (!lastDeath) return player.sendMessage("No last death location has been recorded.");
   try {
-    const dimension = world.getDimension(lastDeath.dimension);
+    const dimension = typeof lastDeath.dimension === "string" ? world.getDimension(lastDeath.dimension) : lastDeath.dimension;
     const safe = resolveSafeTarget(dimension, lastDeath.x + 0.5, lastDeath.y + 2, lastDeath.z + 0.5);
     if (!safe) return player.sendMessage("No safe last-death-adjacent position found.");
     player.teleport(safe, { dimension });
@@ -83,7 +86,7 @@ export function teleportToLastDeath(player) {
   }
 }
 
-function resolveSafeTarget(dimension, x, y, z) {
+function resolveSafeTarget(dimension: Dimension, x: number, y: number, z: number): Vector3 | null {
   const offsets = [
     [0,0],[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,-1],[1,-1],[-1,1],[2,0],[-2,0],[0,2],[0,-2]
   ];
@@ -96,7 +99,7 @@ function resolveSafeTarget(dimension, x, y, z) {
   return null;
 }
 
-function isSafeStand(dimension, x, y, z) {
+function isSafeStand(dimension: Dimension, x: number, y: number, z: number): boolean {
   try {
     const feet = dimension.getBlock({ x, y, z });
     const head = dimension.getBlock({ x, y: y + 1, z });
@@ -112,8 +115,8 @@ function isSafeStand(dimension, x, y, z) {
 }
 
 
-function applyPostTeleportSafety(player) {
+function applyPostTeleportSafety(player: Player): void {
   try {
-    player.runCommandAsync("effect @s resistance 6 1 true");
+    player.runCommand("effect @s resistance 6 1 true");
   } catch {}
 }

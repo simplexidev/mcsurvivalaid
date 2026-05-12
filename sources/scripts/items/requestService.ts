@@ -1,12 +1,13 @@
 import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
-import { system } from "@minecraft/server";
+import { system, type Player } from "@minecraft/server";
 import { getPlayerState, setPlayerState } from "../state/playerState.js";
 import { logger } from "../logging/logger.js";
 import { safeShow } from "../ui/safeShow.js";
+import type { ItemRequest, PlayerState } from "../types/domain.js";
 
-const REQUESTABLE_ITEMS = ["coal","raw_iron","raw_copper","raw_gold","redstone","lapis_lazuli","oak_log","spruce_log","birch_log","cobblestone","sand","gravel","clay_ball","wheat_seeds","sugar_cane"];
+const REQUESTABLE_ITEMS: ReadonlyArray<string> = ["coal","raw_iron","raw_copper","raw_gold","redstone","lapis_lazuli","oak_log","spruce_log","birch_log","cobblestone","sand","gravel","clay_ball","wheat_seeds","sugar_cane"];
 
-export async function showItemRequestsMenu(player) {
+export async function showItemRequestsMenu(player: Player): Promise<void> {
   const root = new ActionFormData().title("Item Requests").button("Create Request").button("View Active Requests").button("Cancel Request");
   const rootResult = await safeShow(root, player, "requestService", "root");
   if (rootResult.canceled || rootResult.selection === undefined) { logger.trace("requestService", "Request root menu canceled", { playerId: player.id }); return; }
@@ -24,7 +25,7 @@ export async function showItemRequestsMenu(player) {
   queueItemRequest(player, itemId, Math.floor(qtyResult.formValues[0]));
 }
 
-function showActiveRequests(player) {
+function showActiveRequests(player: Player): void {
   const state = getPlayerState(player);
   const active = state.requests.active.filter(r => !r.claimed);
   if (active.length === 0) { logger.trace("requestService", "No active requests to display", { playerId: player.id }); return player.sendMessage("No active item requests."); }
@@ -32,7 +33,7 @@ function showActiveRequests(player) {
   player.sendMessage(`Active Requests: ${lines.join(" | ")}`);
 }
 
-async function showCancelRequestMenu(player) {
+async function showCancelRequestMenu(player: Player): Promise<void> {
   const state = getPlayerState(player);
   const active = state.requests.active.filter(r => !r.claimed);
   if (active.length === 0) { logger.trace("requestService", "No active requests to cancel", { playerId: player.id }); return player.sendMessage("No active requests to cancel."); }
@@ -50,7 +51,7 @@ async function showCancelRequestMenu(player) {
   player.sendMessage(`Canceled request ${selected.itemId} x${selected.quantity}.`);
 }
 
-export function queueItemRequest(player, itemId, quantity) {
+export function queueItemRequest(player: Player, itemId: string, quantity: number): void {
   const state = getPlayerState(player);
   const activeCount = state.requests.active.filter(r => !r.claimed).length;
   if (activeCount >= 5) {
@@ -65,8 +66,8 @@ export function queueItemRequest(player, itemId, quantity) {
   player.sendMessage(`Requested ${quantity}x ${itemId}. Ready in ${Math.ceil(duration / 20)}s.`);
 }
 
-export function collectReadyItemRequests(state) {
-  const ready = [];
+export function collectReadyItemRequests(state: PlayerState): ItemRequest[] {
+  const ready: ItemRequest[] = [];
   for (const req of state.requests.active) {
     if (!req.claimed && req.readyAtTick <= system.currentTick) {
       ready.push(req);
