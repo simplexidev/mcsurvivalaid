@@ -14,6 +14,6 @@ export function registerBookOfSurvivalComponent(event) {
       system.run(() => {
         showBookOfSurvivalMenu(player);
       });
-    }
+    },
   });
 }

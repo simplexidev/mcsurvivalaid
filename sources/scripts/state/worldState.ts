@@ -10,16 +10,23 @@ export function createDefaultWorldState() {
     initialized: true,
     createdAtTick: system.currentTick,
     notes: [],
-    knownStructures: {}
+    knownStructures: {},
   };
 }
 
 export function getWorldState() {
   const raw = world.getDynamicProperty(STORAGE_KEYS.worldState);
-  if (typeof raw !== "string" || raw.length === 0) { logger.info("worldState", "No world state found; creating default state", {}); return createDefaultWorldState(); }
+  if (typeof raw !== "string" || raw.length === 0) {
+    logger.info("worldState", "No world state found; creating default state", {});
+    return createDefaultWorldState();
+  }
   try {
     const parsed = JSON.parse(raw);
-    return migrateWorldState({ ...createDefaultWorldState(), ...parsed, knownStructures: { ...(parsed.knownStructures ?? {}) } });
+    return migrateWorldState({
+      ...createDefaultWorldState(),
+      ...parsed,
+      knownStructures: { ...(parsed.knownStructures ?? {}) },
+    });
   } catch (error) {
     logger.error("worldState", "Failed to parse world state; creating defaults", { error: String(error) });
     return createDefaultWorldState();
@@ -55,8 +62,14 @@ function normalizeKnownStructures(knownStructures) {
     const seen = new Set();
     out[type] = ((entries ?? []) as any[])
       .filter(Boolean)
-      .map(e => ({ dimension: e.dimension, x: Math.floor(e.x), y: Math.floor(e.y), z: Math.floor(e.z), tick: Number(e.tick ?? 0) }))
-      .filter(e => {
+      .map((e) => ({
+        dimension: e.dimension,
+        x: Math.floor(e.x),
+        y: Math.floor(e.y),
+        z: Math.floor(e.z),
+        tick: Number(e.tick ?? 0),
+      }))
+      .filter((e) => {
         const key = `${e.dimension}:${e.x}:${e.y}:${e.z}`;
         if (seen.has(key)) return false;
         seen.add(key);
@@ -70,20 +83,36 @@ function normalizeKnownStructures(knownStructures) {
 export function registerKnownStructure(type, dimension, x, y, z) {
   const s = getWorldState();
   if (!s.knownStructures[type]) s.knownStructures[type] = [];
-  s.knownStructures[type].push({ dimension, x: Math.floor(x), y: Math.floor(y), z: Math.floor(z), tick: system.currentTick });
+  s.knownStructures[type].push({
+    dimension,
+    x: Math.floor(x),
+    y: Math.floor(y),
+    z: Math.floor(z),
+    tick: system.currentTick,
+  });
   s.knownStructures = normalizeKnownStructures(s.knownStructures);
   setWorldState(s);
-  logger.trace("worldState", "Registered known structure", { type, dimension, x: Math.floor(x), y: Math.floor(y), z: Math.floor(z) });
+  logger.trace("worldState", "Registered known structure", {
+    type,
+    dimension,
+    x: Math.floor(x),
+    y: Math.floor(y),
+    z: Math.floor(z),
+  });
 }
 
 export function findNearestKnownStructure(type, dimension, x, z) {
   const s = getWorldState();
-  const list = (s.knownStructures[type] ?? []).filter(e => e.dimension === dimension);
+  const list = (s.knownStructures[type] ?? []).filter((e) => e.dimension === dimension);
   if (list.length === 0) return null;
-  let best = null, bestD = Infinity;
+  let best = null,
+    bestD = Infinity;
   for (const e of list) {
     const d = Math.hypot(e.x - x, e.z - z);
-    if (d < bestD) { bestD = d; best = e; }
+    if (d < bestD) {
+      bestD = d;
+      best = e;
+    }
   }
   return best;
 }

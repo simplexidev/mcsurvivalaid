@@ -2,9 +2,42 @@ import { world } from "@minecraft/server";
 import type { BlockMetricKey } from "../types/domain.js";
 import { addQuestProgress } from "./questService.js";
 
-const GROUND_TAGS: ReadonlyArray<string> = ["dirt", "sand", "gravel", "grass", "mud", "clay", "mycelium", "podzol", "stone", "deepslate", "netherrack", "end_stone"];
-const ORE_TAGS: ReadonlyArray<string> = ["ore", "quartz", "ancient_debris", "raw_iron_block", "raw_gold_block", "raw_copper_block"];
-const FAUNA_TAGS: ReadonlyArray<string> = ["log", "leaves", "flower", "sapling", "mangrove", "azalea", "crop", "bamboo", "vine", "cactus", "melon", "pumpkin"];
+const GROUND_TAGS: ReadonlyArray<string> = [
+  "dirt",
+  "sand",
+  "gravel",
+  "grass",
+  "mud",
+  "clay",
+  "mycelium",
+  "podzol",
+  "stone",
+  "deepslate",
+  "netherrack",
+  "end_stone",
+];
+const ORE_TAGS: ReadonlyArray<string> = [
+  "ore",
+  "quartz",
+  "ancient_debris",
+  "raw_iron_block",
+  "raw_gold_block",
+  "raw_copper_block",
+];
+const FAUNA_TAGS: ReadonlyArray<string> = [
+  "log",
+  "leaves",
+  "flower",
+  "sapling",
+  "mangrove",
+  "azalea",
+  "crop",
+  "bamboo",
+  "vine",
+  "cactus",
+  "melon",
+  "pumpkin",
+];
 
 function addBlockProgress(player, category: "blocksBroken" | "blocksPlaced", key: BlockMetricKey): void {
   addQuestProgress(player, category, key, 1);
@@ -30,5 +63,5 @@ function classifyBlock(typeId: string): BlockMetricKey {
 }
 
 function includesAny(value: string, tags: ReadonlyArray<string>): boolean {
-  return tags.some(tag => value.includes(tag));
+  return tags.some((tag) => value.includes(tag));
 }

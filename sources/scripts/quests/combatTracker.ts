@@ -65,9 +65,38 @@ function trackBrokenGearApprox(player: Player): void {
 
 function isGear(typeId: string | undefined): boolean {
   if (!typeId) return false;
-  return typeId.includes("sword") || typeId.includes("axe") || typeId.includes("pickaxe") || typeId.includes("helmet") || typeId.includes("chestplate") || typeId.includes("leggings") || typeId.includes("boots") || typeId.includes("shield");
+  return (
+    typeId.includes("sword") ||
+    typeId.includes("axe") ||
+    typeId.includes("pickaxe") ||
+    typeId.includes("helmet") ||
+    typeId.includes("chestplate") ||
+    typeId.includes("leggings") ||
+    typeId.includes("boots") ||
+    typeId.includes("shield")
+  );
 }
 
 function isLikelyHostile(typeId: string): boolean {
-  return ["minecraft:zombie","minecraft:skeleton","minecraft:creeper","minecraft:spider","minecraft:enderman","minecraft:witch","minecraft:pillager","minecraft:vindicator","minecraft:evocation_illager","minecraft:slime","minecraft:magma_cube","minecraft:blaze","minecraft:ghast","minecraft:guardian","minecraft:elder_guardian","minecraft:drowned","minecraft:husk","minecraft:stray","minecraft:warden"].includes(typeId);
+  return [
+    "minecraft:zombie",
+    "minecraft:skeleton",
+    "minecraft:creeper",
+    "minecraft:spider",
+    "minecraft:enderman",
+    "minecraft:witch",
+    "minecraft:pillager",
+    "minecraft:vindicator",
+    "minecraft:evocation_illager",
+    "minecraft:slime",
+    "minecraft:magma_cube",
+    "minecraft:blaze",
+    "minecraft:ghast",
+    "minecraft:guardian",
+    "minecraft:elder_guardian",
+    "minecraft:drowned",
+    "minecraft:husk",
+    "minecraft:stray",
+    "minecraft:warden",
+  ].includes(typeId);
 }

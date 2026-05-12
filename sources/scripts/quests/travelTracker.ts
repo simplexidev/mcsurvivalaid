@@ -3,7 +3,14 @@ import type { TravelMetricKey } from "../types/domain.js";
 import { MinecraftComponentId } from "../types/domain.js";
 import { addQuestProgress } from "./questService.js";
 
-interface TravelPositionSnapshot { x: number; y: number; z: number; dimensionId: string; wasRidingBoat: boolean; wasGliding: boolean }
+interface TravelPositionSnapshot {
+  x: number;
+  y: number;
+  z: number;
+  dimensionId: string;
+  wasRidingBoat: boolean;
+  wasGliding: boolean;
+}
 
 const lastPositions = new Map<string, TravelPositionSnapshot>();
 
@@ -24,7 +31,14 @@ export function tickTravelTracking(): void {
 
       // Teleport/lag spike guard: ignore and reset baseline for extreme jumps
       if (horizontalDistance > 80 || Math.abs(dy) > 60) {
-        lastPositions.set(player.id, { x: current.x, y: current.y, z: current.z, dimensionId: player.dimension.id, wasRidingBoat: false, wasGliding: player.isGliding });
+        lastPositions.set(player.id, {
+          x: current.x,
+          y: current.y,
+          z: current.z,
+          dimensionId: player.dimension.id,
+          wasRidingBoat: false,
+          wasGliding: player.isGliding,
+        });
         continue;
       }
 
@@ -38,7 +52,12 @@ export function tickTravelTracking(): void {
 
       const isGlidingNow = player.isGliding === true;
       const wasGliding = previous.wasGliding === true;
-      if (isGlidingNow && horizontalDistance > 0.01 && horizontalDistance < 60 && (wasGliding || horizontalDistance < 20)) {
+      if (
+        isGlidingNow &&
+        horizontalDistance > 0.01 &&
+        horizontalDistance < 60 &&
+        (wasGliding || horizontalDistance < 20)
+      ) {
         addTravelProgress(player, "glide_distance", horizontalDistance);
       }
 
@@ -59,6 +78,13 @@ export function tickTravelTracking(): void {
     }
 
     const ridingNow = player.getComponent(MinecraftComponentId.Riding)?.entityRidingOn;
-    lastPositions.set(player.id, { x: current.x, y: current.y, z: current.z, dimensionId: player.dimension.id, wasRidingBoat: ridingNow?.typeId === "minecraft:boat", wasGliding: player.isGliding === true });
+    lastPositions.set(player.id, {
+      x: current.x,
+      y: current.y,
+      z: current.z,
+      dimensionId: player.dimension.id,
+      wasRidingBoat: ridingNow?.typeId === "minecraft:boat",
+      wasGliding: player.isGliding === true,
+    });
   }
 }

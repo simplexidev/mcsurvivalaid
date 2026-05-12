@@ -4,7 +4,7 @@
     "description": {
       "identifier": "survival_aid:book_of_survival"
     },
-    "tags": [ "crafting_table" ],
+    "tags": ["crafting_table"],
     "ingredients": [
       {
         "item": "minecraft:book"

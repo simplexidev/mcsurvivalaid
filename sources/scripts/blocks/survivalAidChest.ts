@@ -12,7 +12,9 @@ export function registerSurvivalChestComponent(event) {
       const state = getPlayerState(player);
       if (state.chest.placed && state.chest.location) {
         player.sendMessage("You can only have one Survival Chest.");
-        try { args.block.setType("minecraft:air"); } catch {}
+        try {
+          args.block.setType("minecraft:air");
+        } catch {}
         const inv = player.getComponent(MinecraftComponentId.Inventory)?.container;
         if (inv) inv.addItem(new ItemStack(ADDON.blocks.survivalChest, 1));
         return;
@@ -24,7 +26,7 @@ export function registerSurvivalChestComponent(event) {
         dimension: args.block.dimension.id,
         x: args.block.location.x,
         y: args.block.location.y,
-        z: args.block.location.z
+        z: args.block.location.z,
       };
       setPlayerState(player, state);
       syncChestVisualForPlayer(player);
@@ -47,7 +49,7 @@ export function registerSurvivalChestComponent(event) {
         clearChestRegistration(state);
         setPlayerState(player, state);
       }
-    }
+    },
   });
 }
 
@@ -80,4 +82,3 @@ function clearChestRegistration(state) {
   state.chest.placed = false;
   state.chest.location = null;
 }
-

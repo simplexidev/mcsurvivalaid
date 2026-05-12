@@ -3,7 +3,7 @@ import { StorageKey } from "../types/domain.js";
 
 export const STORAGE_KEYS = {
   playerStatePrefix: StorageKey.PlayerStatePrefix,
-  worldState: StorageKey.WorldState
+  worldState: StorageKey.WorldState,
 } as const;
 
 export function getPlayerStateKey(player: Player): string {

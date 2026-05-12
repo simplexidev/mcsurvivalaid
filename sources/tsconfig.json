@@ -12,13 +12,6 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": [
-    "scripts/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "behaviors/scripts/**",
-    "behaviors/**/*.json",
-    "resources/**"
-  ]
+  "include": ["scripts/**/*.ts"],
+  "exclude": ["node_modules", "behaviors/scripts/**", "behaviors/**/*.json", "resources/**"]
 }

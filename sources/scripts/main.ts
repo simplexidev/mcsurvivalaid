@@ -1,7 +1,11 @@
 import { world, system } from "@minecraft/server";
 
 import { ADDON } from "./constants.js";
-import { handleSurvivalChestInteract, registerSurvivalChestComponent, syncChestVisualForPlayer } from "./blocks/survivalAidChest.js";
+import {
+  handleSurvivalChestInteract,
+  registerSurvivalChestComponent,
+  syncChestVisualForPlayer,
+} from "./blocks/survivalAidChest.js";
 import { registerBookOfSurvivalComponent } from "./items/bookOfSurvival.js";
 import { handleInitialSpawn } from "./ui/firstSpawnForms.js";
 import { updateHudForAllPlayers } from "./ui/bookOfSurvivalMenu.js";
@@ -61,7 +65,10 @@ function runCompatibilityProbe() {
     ["afterEvents.playerSpawn", typeof world.afterEvents?.playerSpawn?.subscribe === "function"],
     ["beforeEvents.startup", typeof system.beforeEvents?.startup?.subscribe === "function"],
     ["world.getPlayers", typeof world.getPlayers === "function"],
-    ["player.onScreenDisplay.setActionBar", typeof samplePlayer?.onScreenDisplay?.setActionBar === "function" || world.getPlayers().length === 0],
+    [
+      "player.onScreenDisplay.setActionBar",
+      typeof samplePlayer?.onScreenDisplay?.setActionBar === "function" || world.getPlayers().length === 0,
+    ],
   ];
   const failed = checks.filter(([, ok]) => !ok).map(([name]) => name);
   if (failed.length > 0) {

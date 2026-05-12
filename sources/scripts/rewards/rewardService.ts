@@ -8,7 +8,10 @@ import { logger } from "../logging/logger.js";
 import { MinecraftComponentId } from "../types/domain.js";
 
 export function tickRewardService() {
-  logger.trace("rewardService", "Tick reward service", { tick: system.currentTick, players: world.getPlayers().length });
+  logger.trace("rewardService", "Tick reward service", {
+    tick: system.currentTick,
+    players: world.getPlayers().length,
+  });
   for (const player of world.getPlayers()) {
     const state = getPlayerState(player);
     const newlyReadyRequests = [];
@@ -20,20 +23,33 @@ export function tickRewardService() {
     }
     if (newlyReadyRequests.length > 0) {
       setPlayerState(player, state);
-      const summary = newlyReadyRequests.map(req => `${req.quantity}x ${req.itemId.replace("minecraft:", "")}`).join(", ");
+      const summary = newlyReadyRequests
+        .map((req) => `${req.quantity}x ${req.itemId.replace("minecraft:", "")}`)
+        .join(", ");
       player.sendMessage(`Item request ready: ${summary}. Open your Survival Chest to claim.`);
-      logger.info("rewardService", "Item requests became ready", { playerId: player.id, count: newlyReadyRequests.length });
+      logger.info("rewardService", "Item requests became ready", {
+        playerId: player.id,
+        count: newlyReadyRequests.length,
+      });
     }
 
     if (!state.enabled || !state.classTrack.currentClass) {
-      logger.trace("rewardService", "Skipping class reward tick for player", { playerId: player.id, enabled: state.enabled, currentClass: state.classTrack.currentClass });
+      logger.trace("rewardService", "Skipping class reward tick for player", {
+        playerId: player.id,
+        enabled: state.enabled,
+        currentClass: state.classTrack.currentClass,
+      });
       continue;
     }
 
     const worldDay = getCurrentWorldDay();
     maybePromptClassChange(player, worldDay);
     const classTrackDays = Math.max(0, worldDay - state.classTrack.classTrackStartDay);
-    const earnedDays = getEarnedClassRewardDays(classTrackDays, state.classTrack.claimedClassRewardDays, state.classTrack.pendingClassRewardDays);
+    const earnedDays = getEarnedClassRewardDays(
+      classTrackDays,
+      state.classTrack.claimedClassRewardDays,
+      state.classTrack.pendingClassRewardDays
+    );
     if (earnedDays.length > 0) {
       state.classTrack.pendingClassRewardDays.push(...earnedDays);
       setPlayerState(player, state);
@@ -44,7 +60,11 @@ export function tickRewardService() {
 
 export function hasPendingRewards(player) {
   const state = getPlayerState(player);
-  return state.classTrack.pendingClassRewardDays.length > 0 || state.quests.pendingQuestRewards.length > 0 || state.requests.active.some(r => !r.claimed && r.readyAtTick <= system.currentTick);
+  return (
+    state.classTrack.pendingClassRewardDays.length > 0 ||
+    state.quests.pendingQuestRewards.length > 0 ||
+    state.requests.active.some((r) => !r.claimed && r.readyAtTick <= system.currentTick)
+  );
 }
 
 export function claimPendingRewards(player, options: { includeClassAndQuestRewards?: boolean } = {}) {
@@ -56,7 +76,8 @@ export function claimPendingRewards(player, options: { includeClassAndQuestRewar
     const keepPendingClass = [];
     for (const rewardDay of [...state.classTrack.pendingClassRewardDays]) {
       const key = String(rewardDay);
-      const bundle = state.classTrack.partialClassRewards?.[key] ?? getClassRewardsForDay(state.classTrack.currentClass, rewardDay);
+      const bundle =
+        state.classTrack.partialClassRewards?.[key] ?? getClassRewardsForDay(state.classTrack.currentClass, rewardDay);
       const result = grantRewardBundle(player, bundle);
       if (result.ok) {
         state.classTrack.claimedClassRewardDays.push(rewardDay);
@@ -102,22 +123,33 @@ export function claimPendingRewards(player, options: { includeClassAndQuestRewar
     grantedAny,
     includeClassAndQuestRewards,
     pendingClass: state.classTrack.pendingClassRewardDays.length,
-    pendingQuest: state.quests.pendingQuestRewards.length
+    pendingQuest: state.quests.pendingQuestRewards.length,
   });
   player.sendMessage(grantedAny ? "Claimed Survival Aid rewards." : "No Survival Aid rewards are ready.");
 }
 
-export function getCurrentWorldDay() { return Math.floor(world.getAbsoluteTime() / 24000); }
-function getClassRewardsForDay(classId, rewardDay) { return CLASS_REWARDS[classId]?.[rewardDay] ?? CLASSLESS_RECURRING_REWARD; }
+export function getCurrentWorldDay() {
+  return Math.floor(world.getAbsoluteTime() / 24000);
+}
+function getClassRewardsForDay(classId, rewardDay) {
+  return CLASS_REWARDS[classId]?.[rewardDay] ?? CLASSLESS_RECURRING_REWARD;
+}
 
 function grantRewardBundle(player, rewards) {
   const remaining = [];
   let failure = false;
   for (const reward of rewards) {
-    if (failure) { remaining.push(reward); continue; }
+    if (failure) {
+      remaining.push(reward);
+      continue;
+    }
     const ok = giveOrDrop(player, reward.itemId, reward.amount);
     if (!ok) {
-      logger.warn("rewardService", "Failed reward grant", { playerId: player.id, itemId: reward.itemId, amount: reward.amount });
+      logger.warn("rewardService", "Failed reward grant", {
+        playerId: player.id,
+        itemId: reward.itemId,
+        amount: reward.amount,
+      });
       remaining.push(reward);
       failure = true;
     }
