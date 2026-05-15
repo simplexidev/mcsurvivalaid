@@ -1,11 +1,9 @@
+//TODO: This file nees fixed to reflect my recent changes.
+
 import { world, system } from "@minecraft/server";
 
 import { ADDON } from "./constants.js";
-import {
-  handleSurvivalChestInteract,
-  registerSurvivalChestComponent,
-  syncChestVisualForPlayer,
-} from "./blocks/survivalAidChest.js";
+import { SurvivalChest } from "./blocks/survivalAidChest.js";
 import { registerBookOfSurvivalComponent } from "./items/bookOfSurvival.js";
 import { handleInitialSpawn } from "./ui/firstSpawnForms.js";
 import { updateHudForAllPlayers } from "./ui/bookOfSurvivalMenu.js";
@@ -55,25 +53,4 @@ system.runInterval(() => {
   updateHudForAllPlayers();
   for (const p of world.getPlayers()) syncChestVisualForPlayer(p);
 }, 20);
-
-runCompatibilityProbe();
 logger.info("main", `${ADDON.name} loaded.`, { logLevel: logger.getLogLevel() });
-
-function runCompatibilityProbe() {
-  const samplePlayer = world.getPlayers()[0];
-  const checks = [
-    ["afterEvents.playerSpawn", typeof world.afterEvents?.playerSpawn?.subscribe === "function"],
-    ["beforeEvents.startup", typeof system.beforeEvents?.startup?.subscribe === "function"],
-    ["world.getPlayers", typeof world.getPlayers === "function"],
-    [
-      "player.onScreenDisplay.setActionBar",
-      typeof samplePlayer?.onScreenDisplay?.setActionBar === "function" || world.getPlayers().length === 0,
-    ],
-  ];
-  const failed = checks.filter(([, ok]) => !ok).map(([name]) => name);
-  if (failed.length > 0) {
-    logger.warn("main", "Compatibility probe failed", { failed });
-  } else {
-    logger.info("main", "Compatibility probe passed for required API surfaces.", {});
-  }
-}

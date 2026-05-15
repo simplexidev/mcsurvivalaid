@@ -1,84 +1,161 @@
-import { ItemStack, world, system } from "@minecraft/server";
+import {
+  ItemStack,
+  Dimension,
+  world,
+  system,
+  Block,
+  Player,
+  StartupEvent,
+  WorldLoadAfterEvent,
+  BlockCustomComponent,
+  BlockComponentPlayerPlaceBeforeEvent,
+  CustomComponentParameters,
+  BlockComponentOnPlaceEvent,
+  BlockComponentPlayerBreakEvent,
+  BlockComponentPlayerInteractEvent,
+  BlockComponentBlockBreakEvent,
+  Entity,
+} from "@minecraft/server";
 import { ADDON } from "../constants.js";
-import { getPlayerState, setPlayerState } from "../state/playerState.js";
 import { claimPendingRewards, hasPendingRewards } from "../rewards/rewardService.js";
-import { MinecraftComponentId } from "../types/domain.js";
+import { MinecraftComponentId, Position, Location } from "../types/domain.js";
 
-export function registerSurvivalChestComponent(event) {
-  event.blockComponentRegistry.registerCustomComponent(ADDON.components.survivalChest, {
-    onPlace(args) {
-      const player = args.player;
-      if (!player) return;
-      const state = getPlayerState(player);
-      if (state.chest.placed && state.chest.location) {
-        player.sendMessage("You can only have one Survival Chest.");
-        try {
-          args.block.setType("minecraft:air");
-        } catch {}
-        const inv = player.getComponent(MinecraftComponentId.Inventory)?.container;
-        if (inv) inv.addItem(new ItemStack(ADDON.blocks.survivalChest, 1));
-        return;
-      }
-      state.chest.placed = true;
-      state.chest.location = {
-        ownerId: player.id,
-        ownerToken: `${player.id}:${system.currentTick}`,
-        dimension: args.block.dimension.id,
-        x: args.block.location.x,
-        y: args.block.location.y,
-        z: args.block.location.z,
-      };
-      setPlayerState(player, state);
-      syncChestVisualForPlayer(player);
-    },
+export class SurvivalChestState {
+  public isPlaced: boolean;
+  public position: Position | null;
+  public ownerId: string | null;
+  public ownerToken: string | null;
+  public hasPendingRewards: boolean;
+  public pendingRewards: ItemStack[] | null;
 
-    onPlayerInteract(args) {
-      const player = args.player;
-      if (!player) return;
-      handleSurvivalChestInteract(player, args.block);
-    },
+  public constructor(
+    isPlaced: boolean = false,
+    position: Position = Position.newDefault(),
+    ownerId: string | null = "",
+    ownerToken: string | null = "",
+    hasPendingRewards: boolean = false,
+    pendingRewards: ItemStack[] | null = null
+  ) {
+    this.isPlaced = isPlaced;
+    this.position = position;
+    this.ownerId = ownerId;
+    this.ownerToken = ownerToken;
+    this.hasPendingRewards = hasPendingRewards;
+    this.pendingRewards = pendingRewards;
+  }
 
-    onPlayerDestroy(args) {
-      const player = args.player;
-      if (!player) return;
-      const state = getPlayerState(player);
-      if (!state.chest.location) return;
-      const b = args.block.location;
-      const own = state.chest.location;
-      if (own.dimension === args.block.dimension.id && own.x === b.x && own.y === b.y && own.z === b.z) {
-        clearChestRegistration(state);
-        setPlayerState(player, state);
-      }
-    },
-  });
-}
+  private static getPlayerDataKey(player): string {
+    return `"simplexidev:survival_aid:player:"${player.id}":survival_chest"`;
+  }
 
-export function handleSurvivalChestInteract(player, block) {
-  const state = getPlayerState(player);
-  const own = state.chest.location;
-  const b = block.location;
-  const isOwnChest = !!own && own.dimension === block.dimension.id && own.x === b.x && own.y === b.y && own.z === b.z;
-  claimPendingRewards(player, { includeClassAndQuestRewards: isOwnChest });
-}
+  public toJson(): string {
+    return JSON.stringify({
+      isPlaced: this.isPlaced,
+      position: this.position,
+      ownerId: this.ownerId,
+      ownerToken: this.ownerToken,
+      hasPendingRewards: this.hasPendingRewards,
+      pendingRewards: this.pendingRewards,
+    });
+  }
 
-export function syncChestVisualForPlayer(player) {
-  const state = getPlayerState(player);
-  if (!state.chest.location || !state.settings.chestChangesTexture) return;
-  try {
-    const dim = world.getDimension(state.chest.location.dimension);
-    const block = dim.getBlock({ x: state.chest.location.x, y: state.chest.location.y, z: state.chest.location.z });
-    if (!block || block.typeId !== ADDON.blocks.survivalChest) {
-      clearChestRegistration(state);
-      setPlayerState(player, state);
-      player.sendMessage("Your registered Survival Chest was missing or replaced; registration cleared.");
-      return;
-    }
-  } catch {
-    player.sendMessage("Could not access your registered Survival Chest dimension; registration preserved.");
+  public persistPlayerData(player): void {
+    world.setDynamicProperty(SurvivalChestState.getPlayerDataKey(player), this.toJson());
+  }
+
+  public updateState(player): void {}
+
+  public static fromJson(json: string): SurvivalChestState {
+    const data = JSON.parse(json);
+
+    return new SurvivalChestState(
+      Boolean(data.isPlaced ?? false),
+      new Position(data.location.dimension ?? "", data.location ?? Location.newDefault()),
+      String(data.ownerId ?? ""),
+      String(data.ownerToken ?? ""),
+      Boolean(data.hasPendingRewards ?? false),
+      Array<ItemStack>(data.pendingRewards)
+    );
+  }
+
+  public static createDefault(): SurvivalChestState {
+    return new SurvivalChestState(false, Position.newDefault(), "", "", false, null);
   }
 }
 
-function clearChestRegistration(state) {
-  state.chest.placed = false;
-  state.chest.location = null;
+export class SurvivalChest implements BlockCustomComponent {
+  constructor(
+    public state: SurvivalChestState = null,
+    public registered: boolean = false
+  ) {
+    this.state = state ?? SurvivalChestState.createDefault();
+    this.registered = registered ?? false;
+  }
+
+  //TODO: Need to update state before trying to use the old values.
+  //TODO: I don't think i have to do anything else here, as this is essentially meant to be validation prior to the block being placed.
+  public readonly beforeOnPlayerPlace? = (
+    event: BlockComponentPlayerPlaceBeforeEvent,
+    params: CustomComponentParameters
+  ): void => {
+    const player = event.player;
+    const block = event.block;
+    if (player == null) return;
+    if (this.state.isPlaced && this.state.position.location !== block.location) {
+      player.sendMessage("Your Survival Chest is being moved to here.");
+      const oldBlock = this.state.position.dimension.getBlock(this.state.position.location);
+      if (oldBlock !== null || !oldBlock.isAir) {
+        oldBlock.setType("minecraft:air");
+      }
+    }
+  };
+
+  //TODO: Need to update state before trying to use the old values.
+  public readonly onPlayerInteract = (
+    event: BlockComponentPlayerInteractEvent,
+    params: CustomComponentParameters
+  ): void => {
+    const { block, player } = event;
+    if (player == null) return;
+    const b = block.location;
+    if (block.location === this.state.position.location) claimPendingRewards(player);
+  };
+
+  public readonly onBreak? = (event: BlockComponentBlockBreakEvent, params: CustomComponentParameters): void => {
+    const { block, entitySource } = event;
+    const player = this.tryGetPlayer(entitySource);
+    this.handleBreak(block, player);
+  };
+
+  public readonly onPlayerBreak? = (event: BlockComponentPlayerBreakEvent, params: CustomComponentParameters): void => {
+    const { block, player } = event;
+    this.handleBreak(block, player);
+  };
+
+  //TODO: Need to update state before trying to use the old values.
+  private handleBreak(block: Block, player: Player): void {
+    if (!player) return;
+    if (!this.state.position) return;
+    if (block.location !== this.state.position.location) return;
+    this.state.isPlaced = false;
+    this.state.position = null;
+    this.state.persistPlayerData(player);
+  }
+
+  private tryGetPlayer(entity: Entity | null): Player | null {
+    if (entity == null || entity.typeId !== "minecraft:player") return null;
+    return entity as Player;
+  }
+
+  private static getComponentKey(): string {
+    return "survival_aid:survival_chest_component";
+  }
+
+  private static getBlockName(): string {
+    return "survival_aid:survival_chest";
+  }
+
+  public registerComponent(event: StartupEvent) {
+    event.blockComponentRegistry.registerCustomComponent(SurvivalChest.getComponentKey(), new SurvivalChest());
+  }
 }

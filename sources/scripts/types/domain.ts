@@ -1,4 +1,55 @@
-import type { Dimension, Player } from "@minecraft/server";
+import { Dimension, Player, world } from "@minecraft/server";
+
+export class Location {
+  public constructor(
+    public x: number,
+    public y: number,
+    public z: number
+  ) {}
+
+  public static newDefault(): Location {
+    return new Location(0, 0, 0);
+  }
+
+  public toJson(): string {
+    return JSON.stringify({
+      x: this.x,
+      y: this.y,
+      z: this.z,
+    });
+  }
+
+  public static fromJson(json: string): Location {
+    const data = JSON.parse(json);
+
+    return new Location(Number(data.x ?? 0), Number(data.y ?? 0), Number(data.z ?? 0));
+  }
+}
+export class Position {
+  public constructor(
+    public dimension: Dimension,
+    public location: Location
+  ) {}
+
+  public static newDefault(): Position {
+    return new Position(world.getDimension("overworld"), Location.newDefault());
+  }
+
+  public toJson(): string {
+    return JSON.stringify({
+      dimension: this.dimension.id,
+      location: this.location,
+    });
+  }
+
+  public static fromJson(json: string): Position {
+    const data = JSON.parse(json);
+    return new Position(
+      world.getDimension(String(data.dimension ?? "overworld")),
+      new Location(data.location.x ?? 0, data.location.y ?? 0, data.location.z ?? 0)
+    );
+  }
+}
 
 export enum ClassId {
   Adventurer = "adventurer",
