@@ -1,3 +1,6 @@
+import { Player, world } from "@minecraft/server";
+import { SDError, SDResult } from "./Common";
+
 
 
 export interface PlayerRefJson {

@@ -1,3 +1,4 @@
+import { Dimension, Vector3, world } from "@minecraft/server";
 import { SDError, SDResult } from "./Common";
 
 export type DimensionId =

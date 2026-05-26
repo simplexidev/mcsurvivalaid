@@ -1,3 +1,7 @@
+import { Player, world } from "@minecraft/server";
+import { JsonStore, KeyBuilder, LocationRef, Logger, SDResult, SDError } from "../core";
+import { PendingQuestRewardClaim, QuestEvent, QuestObjectiveHandlerRegistry, QuestRewardClaimStatus, QuestRewardDefinition, QuestSystem, QuestTaskDefinition, QuestTaskProgress } from "./Quests";
+
 
 export const WorldEventConstants = Object.freeze({
   ticksPerSecond: 20,

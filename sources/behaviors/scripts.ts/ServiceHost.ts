@@ -1,5 +1,5 @@
 import { Player, world } from "@minecraft/server";
-import { Feature, FeatureContext, KeyBuilder, SDResult, SDServiceProvider, SDError } from "./core";
+import { Feature, FeatureContext, LoggerFactory, SDResult, SDServiceProvider } from "./core";
 import { GuidebookFeature } from "./features/GuidebookFeature";
 import { RewardsFeature } from "./features/RewardsFeature";
 import { QuestsFeature } from "./features/QuestsFeature";
@@ -62,13 +62,8 @@ export class ServiceHost {
     };
   }
 
-  private coreLogger(_featureId: string) {
-    return {
-      debug: () => undefined,
-      info: () => undefined,
-      warn: () => undefined,
-      error: () => undefined,
-    };
+  private coreLogger(featureId: string) {
+    return LoggerFactory.createModuleLogger(featureId);
   }
 
   private registerPlayerLifecycleHandlers(): void {

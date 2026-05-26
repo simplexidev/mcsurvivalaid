@@ -1,3 +1,6 @@
+import { ItemStack, Player } from "@minecraft/server";
+import { SDError, SDResult } from "../core";
+
 
 export enum RewardType {
   Item = "item",
@@ -172,10 +175,7 @@ export class CommandRewardHandler implements RewardHandler<CommandRewardPayload>
     reward: RewardDefinition & { readonly payload: CommandRewardPayload },
   ): SDResult<void> {
     try {
-      const command = reward.payload.command.replaceAll(
-        "{player}",
-        player.name,
-      );
+      const command = reward.payload.command.replace(/\{player\}/g, player.name);
       player.dimension.runCommand(command);
       return SDResult.ok(undefined);
     } catch (error) {
