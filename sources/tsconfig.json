@@ -3,7 +3,7 @@
     "target": "ES2020",
     "module": "Node16",
     "moduleResolution": "Node16",
-    "rootDir": "behaviors/scripts.ts",
+    "rootDir": ".",
     "outDir": "behaviors/scripts",
     "strict": false,
     "noImplicitAny": false,
@@ -12,6 +12,14 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["scripts.ts/**/*.ts"],
-  "exclude": ["node_modules", "behaviors/scripts/**", "behaviors/**/*.json", "resources/**"]
+  "include": [
+    "behaviors/scripts.ts/**/*.ts",
+    "content/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "behaviors/scripts/**",
+    "behaviors/**/*.json",
+    "resources/**"
+  ]
 }
