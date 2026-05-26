@@ -1,8 +1,8 @@
 {
-  "name": "survival_aid",
+  "name": "sdevrealmbundle",
   "version": "0.1.0",
-  "productName": "Survival Aid Minecraft Bedrock Add-On",
-  "description": "Survival Aid Minecraft Bedrock Add-On",
+  "productName": "SimplexiDev's Realms Massive Add-On",
+  "description": "SimplexiDev's Realms Massive Add-On",
   "private": true,
   "dependencies": {
     "@minecraft/math": "^2.4.0",
@@ -29,7 +29,6 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "deploy-local": "deploy.cmd",
-    "mcaddon": "just-scripts mcaddon",
     "enablemcloopback": "CheckNetIsolation.exe LoopbackExempt -a -p=S-1-15-2-1958404141-86561845-1752920682-3514627264-368642714-62675701-733520436",
     "enablemcpreviewloopback": "CheckNetIsolation.exe LoopbackExempt -a -p=S-1-15-2-424268864-5579737-879501358-346833251-474568803-887069379-4040235476",
     "lint:fix": "eslint scripts --fix"

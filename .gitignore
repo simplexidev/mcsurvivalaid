@@ -16,7 +16,6 @@ logs/
 *.log
 .vs/
 
-# Generated Bedrock script build output
-/sources/behaviors/scripts/**/*.js
-/sources/behaviors/scripts/**/*.js.map
-/sources/behaviors/scripts/**/*.d.ts
+# Generated output
+.build/
+!.build/.gitkeep

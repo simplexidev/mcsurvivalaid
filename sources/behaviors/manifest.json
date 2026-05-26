@@ -1,8 +1,8 @@
 {
   "format_version": 2,
   "header": {
-    "name": "Survival Aid Behavior Pack",
-    "description": "Behavior Pack for the Add-On 'Survival Aid' by SimplexiDev.",
+    "name": "SimplexiDev's Realms Massive Add-On Behavior Pack",
+    "description": "SimplexiDev's Realms Massive Add-On Behavior Pack",
     "uuid": "015f4d48-9302-4958-931f-1fff3c3d98ee",
     "version": [0, 1, 0],
     "min_engine_version": [1, 26, 20]
@@ -34,10 +34,5 @@
       "uuid": "4949491a-12af-4464-b99d-5d3ce10fef85",
       "version": [0, 1, 0]
     }
-  ],
-  "metadata": {
-    "generated_with": {
-      "blockbench_item_wizard": ["1.2.4"]
-    }
-  }
+  ]
 }
