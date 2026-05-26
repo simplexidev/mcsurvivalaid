@@ -31,6 +31,441 @@ Codex should use this file as the main implementation plan for completing the ad
 
 ---
 
+# -2. Existing API preservation contract
+
+This project already has meaningful `core/` and `features/` API surfaces. Codex must treat those APIs as the user's intended architecture.
+
+The goal is **not** to replace the existing APIs with a smaller generic framework.
+
+The goal is to **repair, complete, connect, and bootstrap** the existing APIs so the add-on works as one monolithic mod with many simultaneous features.
+
+## -2.1 Core rule
+
+Codex must preserve existing public APIs unless one of the following is true:
+
+1. The API is impossible to compile because it references invalid or unavailable Minecraft API types and no adapter can fix it.
+2. The API is an obvious duplicate of another existing project API and keeping both would create a broken conflict.
+3. The API is dead placeholder code with no meaningful contract.
+4. The active implementation requires a very small signature change to wire systems together.
+
+Even when one of these applies, Codex must prefer the smallest compatible repair over replacement.
+
+## -2.2 What “preserve” means
+
+Codex must preserve, whenever practical:
+
+- exported interfaces
+- exported classes
+- exported enums
+- exported type aliases
+- DTO shapes
+- method names
+- property names
+- file names
+- feature/domain separation
+- existing comments that describe intended behavior
+- existing dynamic property abstractions
+- existing result/error abstractions
+- existing form abstractions
+- existing logging abstractions
+- existing migration abstractions
+- existing player/location abstractions
+- existing reward/quest/world-event/portal API concepts
+
+Codex may add overloads, optional parameters, adapter methods, wrappers, index exports, glue classes, or compatibility aliases.
+
+Codex must not simplify a rich API down to a minimal placeholder just because doing so compiles faster.
+
+## -2.3 Prohibited replacement behavior
+
+Codex must not:
+
+- delete the `core/` directory and replace it with a tiny generic utility file
+- collapse multiple existing APIs into a single catch-all service
+- replace domain-specific APIs with loosely typed `any` records
+- remove DTOs just because they are not fully wired yet
+- remove feature APIs because feature implementation is incomplete
+- remove existing abstractions such as result/error, JSON store, dynamic property store, logging, forms, migrations, player refs, or location refs
+- rewrite the project as a minimal demo add-on
+- reduce the project to only Guidebook stubs
+- remove public APIs to avoid fixing imports
+- remove public APIs to avoid fixing TypeScript errors
+
+## -2.4 Allowed repair behavior
+
+Codex may:
+
+- fix imports
+- add missing imports
+- add missing exports
+- split large files into subfiles only if public exports remain available
+- add `index.ts` barrel exports
+- add concrete implementations behind existing interfaces
+- add adapter classes to bridge existing APIs to `ServiceHost`
+- add compatibility aliases for renamed symbols
+- add thin `*Feature` wrapper classes around existing feature APIs
+- move a type to a better file only if old import paths are preserved through re-export
+- add missing constructor parameters
+- add missing methods required by an existing interface
+- add narrow type guards around Minecraft API objects
+- add fallback implementations for early-execution constraints
+- add TODO comments for API-limited behavior while keeping the contract intact
+
+## -2.5 Deletion rule
+
+Before deleting or replacing any existing `.ts` file under:
+
+```text
+sources/behaviors/scripts.ts/core/
+sources/behaviors/scripts.ts/features/
+```
+
+Codex must prove that deletion is safe by checking all of these:
+
+1. The file is not imported anywhere.
+2. The file does not export a public API intended by the project.
+3. The file is not named in this plan.
+4. The file is not part of the existing architecture.
+5. The file is either empty, obsolete, or purely duplicative.
+
+If any condition is uncertain, Codex must not delete the file.
+
+Prefer marking obsolete exports as compatibility wrappers over deletion.
+
+## -2.6 Refactor rule
+
+Refactors must be compatibility-preserving.
+
+If Codex renames a symbol, it must either:
+
+1. update every reference safely, or
+2. provide an alias export with the old name.
+
+Example:
+
+```ts
+export { NewFeatureContext as FeatureContext };
+```
+
+or:
+
+```ts
+export type FeatureContext = NewFeatureContext;
+```
+
+Do this only when needed. Prefer not to rename existing public APIs.
+
+## -2.7 ServiceHost glue rule
+
+`ServiceHost` should connect the existing APIs.
+
+It should not replace them.
+
+The correct implementation pattern is:
+
+```text
+existing core APIs
+        ↓
+concrete service implementations
+        ↓
+ServiceHost dependency wiring
+        ↓
+feature wrapper classes
+        ↓
+Guidebook integration
+```
+
+The incorrect pattern is:
+
+```text
+delete existing APIs
+        ↓
+create tiny generic service objects
+        ↓
+stub feature behavior
+```
+
+## -2.8 Feature wrapper rule
+
+When an existing feature API file exists, such as:
+
+```text
+features/Quests.ts
+features/Rewards.ts
+features/Achievements.ts
+features/WorldEvents.ts
+features/Portals.ts
+features/Guidebook.ts
+```
+
+Codex should usually keep it and add a wrapper/initializer file:
+
+```text
+features/QuestsFeature.ts
+features/RewardsFeature.ts
+features/AchievementsFeature.ts
+features/WorldEventsFeature.ts
+features/PortalsFeature.ts
+features/GuidebookFeature.ts
+```
+
+The wrapper should instantiate/configure/use the existing API.
+
+Do not replace the existing API file with a tiny feature stub.
+
+## -2.9 Compile-error repair priority
+
+When existing APIs do not compile, fix them in this order:
+
+1. Missing imports.
+2. Missing exports.
+3. Wrong relative paths.
+4. Type name mismatch.
+5. Incomplete interface implementation.
+6. Bedrock API type mismatch.
+7. Missing concrete implementation.
+8. Missing glue/adapter.
+9. Last resort: small compatibility-preserving signature adjustment.
+
+Do not delete the API as a compile-error fix.
+
+## -2.10 “Make consistent” does not mean “rewrite”
+
+When this plan says to make names consistent, Codex must interpret that as:
+
+- align imports/exports
+- add aliases where needed
+- pick the existing dominant naming convention
+- repair conflicting references
+
+It does **not** mean deleting the existing API and replacing it with a new minimal convention.
+
+## -2.11 If removal truly makes sense
+
+If removing something truly makes sense, Codex must keep the removal narrow.
+
+Acceptable removals:
+
+- empty placeholder files
+- stale generated output when regenerated by build
+- obsolete Survival Aid recipes that conflict with Guidebook requirements
+- duplicate aliases after all references are migrated
+- broken imports that point to nonexistent files
+
+Unacceptable removals:
+
+- established core API files
+- feature domain API files
+- DTO definitions
+- result/error abstractions
+- dynamic property abstractions
+- form abstractions
+- logging abstractions
+- migration abstractions
+
+## -2.12 Required preservation audit
+
+Before the final response, Codex must report:
+
+```text
+API preservation audit:
+- core files preserved:
+  - ...
+- feature API files preserved:
+  - ...
+- files deleted:
+  - ... plus reason
+- public APIs renamed:
+  - ... plus compatibility alias or migration note
+- adapters/wrappers added:
+  - ...
+```
+
+If Codex deletes or replaces a core/feature API file, it must explicitly justify why no repair path was reasonable.
+
+
+---
+
+# -3. TypeScript source preservation contract
+
+This project is a TypeScript-first Minecraft Bedrock add-on.
+
+Codex must not replace TypeScript source files with plain JavaScript.
+
+The source of truth is TypeScript under:
+
+```text
+sources/behaviors/scripts.ts/
+```
+
+Compiled JavaScript belongs only under:
+
+```text
+sources/behaviors/scripts/
+```
+
+## -3.1 Hard rule
+
+Codex must preserve and repair TypeScript source.
+
+Codex must not:
+
+- delete `.ts` source files and replace them with `.js`
+- move runtime source authoring from `.ts` to `.js`
+- convert classes/interfaces/enums/types into untyped JavaScript objects
+- remove TypeScript interfaces to avoid type errors
+- remove TypeScript enums to avoid type errors
+- remove type annotations to make code easier to compile
+- replace typed APIs with `any`-heavy JavaScript-style code
+- hand-author files in `sources/behaviors/scripts/` instead of fixing files in `sources/behaviors/scripts.ts/`
+- treat compiled JavaScript output as the editable source of truth
+
+## -3.2 Allowed JavaScript files
+
+JavaScript files are allowed only when they are generated build output or already-existing build/tooling files.
+
+Allowed examples:
+
+```text
+sources/behaviors/scripts/main.js
+sources/behaviors/scripts/**/*.js
+eslint.config.js
+prettier.config.js
+webpack.config.js
+rollup.config.js
+```
+
+Codex may update build/tooling JavaScript config files when necessary.
+
+Codex must not implement gameplay logic directly in generated-output JavaScript.
+
+## -3.3 Build output rule
+
+If a JavaScript file under:
+
+```text
+sources/behaviors/scripts/
+```
+
+needs to change, Codex should change the corresponding TypeScript file under:
+
+```text
+sources/behaviors/scripts.ts/
+```
+
+then run the build.
+
+Do not manually edit compiled JavaScript unless there is no TypeScript source equivalent and Codex documents why.
+
+## -3.4 TypeScript repair rule
+
+When TypeScript errors occur, Codex must fix the TypeScript.
+
+Preferred fixes:
+
+1. add correct imports
+2. add correct exports
+3. repair type names
+4. add missing interfaces/classes/enums
+5. add concrete implementations
+6. add narrow type guards
+7. use compatibility aliases
+8. add adapter types around Bedrock API differences
+9. use local, justified `unknown` or `any` only as a last resort
+
+Do not “solve” TypeScript errors by converting files to JavaScript.
+
+## -3.5 Public type preservation
+
+Codex must preserve meaningful TypeScript constructs, including:
+
+- interfaces
+- classes
+- enums
+- type aliases
+- readonly DTO shapes
+- generic result/error types
+- service interfaces
+- feature interfaces
+- reward/quest/world-event/portal definitions
+- discriminated unions, if already present
+- namespace-safe key builders
+- typed form models
+
+If Codex must change a public type, it must keep compatibility where practical.
+
+## -3.6 Generated content must be TypeScript
+
+Generated content files must be TypeScript modules, not JSON or JavaScript, unless the existing repository already uses JSON content definitions.
+
+Preferred:
+
+```text
+dailyQuestDefinitions.ts
+weeklyQuestDefinitions.ts
+worldEventDefinitions.ts
+achievementDefinitions.ts
+documentationPages.ts
+```
+
+These files should export typed readonly arrays.
+
+Example:
+
+```ts
+export const dailyQuestDefinitions: readonly QuestDefinition[] = [
+  // ...
+];
+```
+
+Do not generate:
+
+```text
+dailyQuestDefinitions.js
+weeklyQuestDefinitions.js
+```
+
+as source files.
+
+## -3.7 No downgrade to plain objects
+
+Codex must not replace established TypeScript models with anonymous plain objects if typed models already exist.
+
+Acceptable:
+
+```ts
+const definition: QuestDefinition = { ... };
+```
+
+Not acceptable as an API replacement:
+
+```js
+const definition = { ... };
+```
+
+## -3.8 TypeScript audit
+
+Before the final response, Codex must report:
+
+```text
+TypeScript preservation audit:
+- TypeScript source files preserved:
+  - ...
+- TypeScript files added:
+  - ...
+- JavaScript files generated by build:
+  - ...
+- JavaScript files manually edited:
+  - ... plus reason, or "none"
+- Any use of `any`:
+  - ... plus reason
+```
+
+If Codex converted TypeScript source to JavaScript, the project is incomplete and must be repaired before final completion.
+
+
+---
+
 # -1. Codex autonomy rules for no-human-intervention execution
 
 This section exists so Codex can run this plan to completion without stopping for routine clarification.
@@ -255,7 +690,7 @@ sources/behaviors/scripts.ts/   TypeScript source
 sources/behaviors/scripts/      compiled JavaScript output
 ```
 
-Codex should keep this pattern unless it explicitly fixes all scripts/manifests/build tooling that depend on it.
+Codex must keep this pattern. If build tooling is broken, fix the tooling around this TypeScript source/output pattern instead of replacing TypeScript with JavaScript.
 
 ## 0.4 Preserve user-owned art workflow
 
@@ -392,7 +827,7 @@ Codex must fix these before implementing gameplay content:
    import { QuestModule } from "./modules/QuestModule";
    ```
 
-   The repo currently uses `features/`, not `modules/`. Replace this architecture with a consistent `Feature` system.
+   The repo currently uses `features/`, not `modules/`. Repair this wiring to use the existing `features/` architecture and add a consistent `Feature` initialization layer around the existing APIs. Do not replace the existing core/feature APIs.
 
 4. Several files use names from the earlier API draft inconsistently:
 
@@ -578,6 +1013,20 @@ sources/behaviors/scripts.ts/
 
 If Codex chooses to keep API files like `features/Quests.ts` and add feature entry files beside them, that is acceptable. The important requirement is that each feature has a concrete initializer class.
 
+## 3.1 Existing API preservation in final architecture
+
+The final script architecture must be built by preserving the existing `core/` API files and existing feature-domain API files.
+
+The listed final shape is an integration target, not permission to replace rich existing files with stubs.
+
+If a file already exists, Codex should repair it.
+
+If a required `*Feature.ts` file does not exist, Codex should add it as glue around the existing feature API.
+
+If an existing file is too large or has mixed concerns, Codex may split implementation details into subfiles, but must preserve the original public exports through re-export or compatibility aliases.
+
+
+
 ---
 
 # 4. Required `main.ts`
@@ -608,7 +1057,7 @@ Do not put feature logic directly in `main.ts`.
 
 # 5. Required `ServiceHost.ts`
 
-Replace the current incomplete `ServiceHost.ts` with a complete host.
+Repair and complete the current `ServiceHost.ts` into a complete host. Preserve existing API contracts and imports where practical.
 
 The host must:
 
@@ -698,7 +1147,7 @@ export interface FeatureContext {
 }
 ```
 
-If current names differ, make the whole codebase consistent.
+If current names differ, repair references and add compatibility aliases where needed. Prefer the existing dominant project naming and do not rewrite established APIs solely for naming consistency.
 
 Add `jsonStore` and `logger` to the feature context. Several systems need both.
 
@@ -706,7 +1155,7 @@ Add `jsonStore` and `logger` to the feature context. Several systems need both.
 
 # 7. Core service provider cleanup
 
-The current `SDServiceProvider` in `core/Common.ts` references types that are not imported in that file. Either move it to its own file or add correct imports.
+The current `SDServiceProvider` in `core/Common.ts` references types that are not imported in that file. Prefer adding correct imports or a compatibility-preserving wrapper. Move it to its own file only if old exports remain available through `core/index.ts` or compatibility re-exports.
 
 Recommended:
 
@@ -1817,10 +2266,10 @@ Every missing required asset has a `.txt` placeholder explaining what the user m
 Codex should work in this order:
 
 1. Fix `tsconfig.json`, package scripts, and missing `main.ts`.
-2. Fix core imports and naming consistency.
+2. Fix core imports and naming consistency without removing or collapsing core APIs.
 3. Finish `SDServiceProvider` / core service provider.
-4. Finish `Feature`, `FeatureContext`, and `FeatureRegistry`.
-5. Replace `ServiceHost.ts` with a complete feature host.
+4. Repair and complete the existing `Feature`, `FeatureContext`, and `FeatureRegistry` APIs.
+5. Repair `ServiceHost.ts` into a complete feature host without deleting established core APIs.
 6. Create required `*Feature` classes.
 7. Make the project compile before adding large content.
 8. Finish RewardsFeature and Guidebook reward claiming.
@@ -2217,6 +2666,37 @@ If other JSON references missing textures, create corresponding `.txt` placehold
 
 # 32. Milestone-by-milestone done gates
 
+
+
+## 32.T TypeScript preservation gate
+
+Passes when:
+
+- gameplay source remains in `sources/behaviors/scripts.ts/`
+- no `.ts` source file was replaced by handwritten `.js`
+- generated JavaScript, if present, exists only under the compiled output folder
+- required content definitions are TypeScript modules unless repository convention requires otherwise
+- public interfaces/classes/enums/types are preserved or compatibility aliases exist
+- TypeScript compilation is attempted after repairs
+
+This gate must pass before Codex proceeds to final completion.
+
+
+## 32.0 API preservation gate
+
+Passes when:
+
+- existing `core/` API files are still present unless individually justified
+- existing feature API files are still present unless individually justified
+- `ServiceHost` wires existing APIs instead of replacing them
+- `*Feature` classes act as glue/initializers around domain APIs
+- public exports remain available through original files or compatibility re-exports
+- no established API was replaced by a tiny generic placeholder
+
+This gate must pass before Codex proceeds to large content generation.
+
+
+
 Codex must not move to the next milestone unless the current gate passes or the failure is documented and non-blocking.
 
 ## 32.1 Infrastructure gate
@@ -2392,6 +2872,8 @@ Did I generate at least 50 weekly quests?
 Did I generate at least 5 world events?
 Did I include required achievement milestones?
 Did I migrate active branding to SimplexiDev's MAP?
+Did I preserve TypeScript source under sources/behaviors/scripts.ts?
+Did I avoid replacing TypeScript with handwritten JavaScript?
 Did I run validation?
 Did I document anything that could not be validated?
 ```
@@ -2403,4 +2885,62 @@ If any answer is no, Codex must either fix it or clearly mark the project incomp
 
 # 26. Final instruction to Codex
 
-Implement the project to completion according to this plan. Do not stop after planning. Prefer compiling, working code over speculative abstractions. Preserve the user's existing architecture where practical, but fix broken imports, missing entry points, inconsistent naming, and Survival Aid leftovers. Do not generate binary assets. Use placeholder `.txt` files for missing art. Ensure the final add-on is clearly branded as **SimplexiDev's MAP** and that all player-facing rewards are claimed through the **Guidebook**. If a normal implementation detail is ambiguous, use the defaults in this file, document the assumption, and continue.
+Implement the project to completion according to this plan. Do not stop after planning. Prefer compiling, working code that preserves the existing API architecture over speculative rewrites or simplifications. Preserve the user's existing architecture and public API contracts by default, but fix broken imports, missing entry points, inconsistent naming, and Survival Aid leftovers. Do not generate binary assets. Use placeholder `.txt` files for missing art. Ensure the final add-on is clearly branded as **SimplexiDev's MAP** and that all player-facing rewards are claimed through the **Guidebook**. If a normal implementation detail is ambiguous, use the defaults in this file, document the assumption, and continue.
+
+
+---
+
+# 38. If a prior Codex run deleted or simplified APIs
+
+If Codex starts from a branch where a previous Codex run already deleted, collapsed, or simplified the user's `core/` or feature APIs, Codex must attempt recovery.
+
+Recovery order:
+
+1. Inspect git history if available.
+2. Restore deleted API files from the previous commit if available.
+3. If git history is unavailable, reconstruct the public API surfaces from references, imports, comments, and remaining files.
+4. Keep simplified code only as an internal implementation if it can sit behind the restored APIs.
+5. Do not continue building content on top of the simplified replacement until the API preservation gate passes.
+
+Codex should use commands like these when available:
+
+```bash
+git status
+git diff
+git log --oneline -- sources/behaviors/scripts.ts/core sources/behaviors/scripts.ts/features
+git checkout HEAD~1 -- sources/behaviors/scripts.ts/core
+git checkout HEAD~1 -- sources/behaviors/scripts.ts/features
+```
+
+Only use checkout/restore commands when they will not discard intentional user manual edits. If uncertain, inspect diffs first and prefer manual restoration.
+
+
+
+---
+
+# 39. If a prior Codex run converted TypeScript to JavaScript
+
+If Codex starts from a branch where a prior run deleted `.ts` files or replaced gameplay source with plain `.js`, Codex must restore TypeScript source before continuing.
+
+Recovery order:
+
+1. Inspect `git status` and `git diff`.
+2. Inspect history for deleted `.ts` files.
+3. Restore deleted `.ts` files from the last good commit where possible.
+4. Move any useful logic from handwritten `.js` back into `.ts`.
+5. Delete or regenerate handwritten output `.js` only after TypeScript source is restored.
+6. Run the TypeScript build.
+7. Do not proceed to feature/content implementation until the TypeScript preservation gate passes.
+
+Useful commands when safe:
+
+```bash
+git status
+git diff -- sources/behaviors/scripts.ts sources/behaviors/scripts
+git log --oneline -- sources/behaviors/scripts.ts
+git checkout HEAD~1 -- sources/behaviors/scripts.ts
+npm run build
+```
+
+Do not discard intentional manual user edits. If uncertain, inspect diffs first and port manual logic back into TypeScript.
+
