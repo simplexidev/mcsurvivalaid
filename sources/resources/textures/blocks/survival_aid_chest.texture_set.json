@@ -1,7 +1,0 @@
-{
-  "format_version": "1.21.30",
-  "minecraft:texture_set": {
-    "color": "survival_aid_chest",
-    "metalness_emissive_roughness_subsurface": "survival_aid_chest_mers"
-  }
-}

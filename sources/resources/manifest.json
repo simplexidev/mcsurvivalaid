@@ -1,8 +1,8 @@
 {
   "format_version": 2,
   "header": {
-    "name": "Survival Aid Resource Pack",
-    "description": "Resource Pack for the Add-On 'Survival Aid' by SimplexiDev.",
+    "name": "SimplexiDev's Massive Add-On",
+    "description": "SimplexiDev's Massive Add-On Resource Pack",
     "uuid": "4949491a-12af-4464-b99d-5d3ce10fef85",
     "version": [0, 1, 0],
     "min_engine_version": [1, 26, 20]
