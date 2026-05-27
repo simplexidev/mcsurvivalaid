@@ -1,9 +1,9 @@
 {
-  "resource_pack_name": "Survival Aid",
+  "resource_pack_name": "SimplexiDev's Massive Add-On",
   "texture_name": "atlas.items",
   "texture_data": {
-    "book_of_survival": {
-      "textures": "textures/items/book_of_survival"
+    "guidebook": {
+      "textures": "textures/items/guidebook"
     }
   }
 }

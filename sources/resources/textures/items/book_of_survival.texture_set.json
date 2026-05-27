@@ -1,7 +1,0 @@
-{
-  "format_version": "1.21.30",
-  "minecraft:texture_set": {
-    "color": "book_of_survival",
-    "metalness_emissive_roughness_subsurface": "book_of_survival_mers"
-  }
-}

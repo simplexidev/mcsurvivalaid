@@ -4,6 +4,7 @@
   "productName": "SimplexiDev's Realms Massive Add-On",
   "description": "SimplexiDev's Realms Massive Add-On",
   "private": true,
+  "main": "behaviors/scripts/EntryPoint.js",
   "dependencies": {
     "@minecraft/math": "^2.4.0",
     "@minecraft/server": "^2.7.0",

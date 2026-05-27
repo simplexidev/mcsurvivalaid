@@ -1,0 +1,7 @@
+{
+  "format_version": "1.21.20",
+  "minecraft:texture_set": {
+    "color": "guidebook",
+    "metalness_emissive_roughness_subsurface": "guidebook_mers"
+  }
+}
