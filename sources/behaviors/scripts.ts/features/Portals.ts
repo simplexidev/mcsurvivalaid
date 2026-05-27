@@ -1,3 +1,6 @@
+import { Block, Dimension, Player, Vector3, world, system } from "@minecraft/server";
+import { ActionFormButton, BlockLocationRef, FormService, JsonStore, KeyBuilder, LocationJson, LocationRef, PlayerRef, PlayerRefJson, SDResult, SDError } from "../core";
+
 
 export enum PortalColor {
   White = "white",

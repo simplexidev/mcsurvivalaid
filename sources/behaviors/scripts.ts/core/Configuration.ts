@@ -55,7 +55,7 @@ export class KeyBuilder {
     return value
       .trim()
       .toLowerCase()
-      .replaceAll(" ", "_")
+      .replace(/ /g, "_")
       .replace(/[^a-z0-9_\-:.]/g, "_");
   }
 }

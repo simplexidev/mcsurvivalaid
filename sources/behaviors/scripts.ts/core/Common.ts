@@ -1,3 +1,12 @@
+import { KeyBuilder, ConfigService, DefaultConfigService } from "./Configuration";
+import { DynamicPropertyStore, JsonDynamicPropertyStore, DefaultJsonSerializer, JsonStore, MinecraftDynamicPropertyStore } from "./Json";
+import { FormService, MinecraftFormService } from "./Forms";
+import { LoggerFactory } from "./Logging";
+import { MigrationService, DefaultMigrationService } from "./Migration";
+import { Feature, FeatureContext, FeatureRegistry, DefaultFeatureRegistry } from "./Features";
+import { PlayerService } from "./Player";
+import { RewardService, DefaultRewardService } from "../features/Rewards";
+
 //TODO: Localize all error messages via `*.lang` files, focusing on `en_US`.
 //TODO: Create an `enum` for all error codes.
 
@@ -94,7 +103,7 @@ export class SDServiceProvider {
 
     this.properties = MinecraftDynamicPropertyStore.forWorld();
 
-    this.jsonStore = new DynamicPropertyJsonStore(
+    this.jsonStore = new JsonDynamicPropertyStore(
       this.properties,
       new DefaultJsonSerializer(),
     );
@@ -124,6 +133,7 @@ export class SDServiceProvider {
       rewards: this.rewards,
       migrations: this.migrations,
       modules: this.modules,
+      logger: LoggerFactory.createModuleLogger(module.metadata.id),
     };
   }
 }

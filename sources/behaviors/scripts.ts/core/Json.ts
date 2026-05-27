@@ -78,9 +78,10 @@ export abstract class JsonStoreBase implements JsonStore {
 }
 
 export type DynamicPropertyPrimitive = string | number | boolean;
+type DynamicPropertyValue = string | number | boolean | { x: number; y: number; z: number };
 
 export interface DynamicPropertyHost {
-  getDynamicProperty(identifier: string): string | number | boolean | undefined;
+  getDynamicProperty(identifier: string): DynamicPropertyValue | undefined;
 
   setDynamicProperty(
     identifier: string,

@@ -1,133 +1,84 @@
 import { Player, world } from "@minecraft/server";
-import { QuestModule } from "./modules/QuestModule";
+import { Feature, FeatureContext, LoggerFactory, SDResult, SDServiceProvider } from "./core";
+import { GuidebookFeature } from "./features/GuidebookFeature";
+import { RewardsFeature } from "./features/RewardsFeature";
+import { QuestsFeature } from "./features/QuestsFeature";
+import { AchievementsFeature } from "./features/AchievementsFeature";
+import { WorldEventsFeature } from "./features/WorldEventsFeature";
+import { PortalsFeature } from "./features/PortalsFeature";
+import { TeleportFeature } from "./features/TeleportFeature";
+import { StarterItemsFeature } from "./features/StarterItemsFeature";
+import { SettingsFeature } from "./features/SettingsFeature";
+import { DocumentationFeature } from "./features/DocumentationFeature";
+import { DeveloperToolsFeature } from "./features/DeveloperToolsFeature";
 
 export class ServiceHost {
-  public readonly core: SimplexiCoreServices;
-
-  private readonly modules: GameModule[] = [];
+  public readonly core: SDServiceProvider;
+  private readonly features: Feature[] = [];
 
   public constructor(authorNamespace: string) {
-    this.core = new SimplexiCoreServices(authorNamespace);
+    this.core = new SDServiceProvider(authorNamespace);
   }
 
-  public initialize(): Result<void> {
-    this.core.logger.info("host", "Initializing service host.");
+  public initialize(): SDResult<void> {
+    const registered = this.registerDefaultFeatures();
+    if (registered.isFailure) return registered;
 
-    const questModule = new QuestModule();
-
-    this.registerModule(questModule);
-
-    const initializeResult = this.initializeModules();
-
-    if (initializeResult.isFailure) {
-      this.core.logger.error("host", "Service host initialization failed.", {
-        error: initializeResult.error,
-      });
-
-      return initializeResult;
-    }
+    const initResult = this.core.modules.initializeAll((feature) => this.createFeatureContext(feature));
+    void initResult;
 
     this.registerPlayerLifecycleHandlers();
-
-    this.core.logger.info("host", "Service host initialized.");
-
-    return Result.ok(undefined);
+    return SDResult.ok(undefined);
   }
 
-  public registerModule(module: GameModule): Result<void> {
-    const result = this.core.modules.register(module);
+  private registerDefaultFeatures(): SDResult<void> {
+    const defaults: Feature[] = [
+      new RewardsFeature(),
+      new SettingsFeature(),
+      new DocumentationFeature(),
+      new DeveloperToolsFeature(),
+      new AchievementsFeature(),
+      new QuestsFeature(),
+      new WorldEventsFeature(),
+      new PortalsFeature(),
+      new TeleportFeature(),
+      new StarterItemsFeature(),
+      new GuidebookFeature(),
+    ];
 
-    if (result.isFailure) {
-      this.core.logger.error("host", "Failed to register module.", {
-        moduleId: module.metadata.id,
-        error: result.error,
-      });
-
-      return result;
+    for (const feature of defaults) {
+      const result = this.core.modules.register(feature);
+      if (result.isFailure) return result;
+      this.features.push(feature);
     }
 
-    this.modules.push(module);
-
-    this.core.logger.info("host", "Module registered.", {
-      moduleId: module.metadata.id,
-      displayName: module.metadata.displayName,
-      version: module.metadata.version,
-    });
-
-    return Result.ok(undefined);
+    return SDResult.ok(undefined);
   }
 
-  private initializeModules(): Result<void> {
-    for (const module of this.modules) {
-      const context = this.createModuleContext(module);
-      const result = module.initialize(context);
-
-      if (result instanceof Promise) {
-        return Result.fail(
-          "Async module initialization is not supported in this simple host example."
-        );
-      }
-
-      if (result.isFailure) {
-        return result;
-      }
-    }
-
-    return Result.ok(undefined);
-  }
-
-  private createModuleContext(module: GameModule): ModuleContext {
+  private createFeatureContext(feature: Feature): FeatureContext {
     return {
-      keys: this.createModuleKeys(module.metadata.id),
-      logger: this.core.createModuleLogger(module),
-      forms: this.core.forms,
-      config: this.core.config,
-      rewards: this.core.rewards,
-      migrations: this.core.migrations,
-      modules: this.core.modules,
+      ...this.core.createModuleContext(feature),
+      logger: this.coreLogger(feature.metadata.id),
     };
   }
 
-  private createModuleKeys(moduleId: string): KeyBuilder {
-    return this.core.createModuleKeys(moduleId);
+  private coreLogger(featureId: string) {
+    return LoggerFactory.createModuleLogger(featureId);
   }
 
   private registerPlayerLifecycleHandlers(): void {
     world.afterEvents.playerSpawn.subscribe((event) => {
-      if (!event.initialSpawn) {
-        return;
+      if (event.initialSpawn) {
+        this.onPlayerInitialSpawn(event.player);
       }
-
-      this.onPlayerInitialSpawn(event.player);
     });
   }
 
-  private onPlayerInitialSpawn(player: Player): void {
-    this.core.logger.info("host", "Player initial spawn detected.", {
-      playerId: player.id,
-      playerName: player.name,
-    });
-
-    for (const module of this.modules) {
-      if (this.isPlayerAwareModule(module)) {
-        const result = module.onPlayerInitialSpawn(player);
-
-        if (result.isFailure) {
-          this.core.logger.warn("host", "Module failed during player initial spawn.", {
-            moduleId: module.metadata.id,
-            playerId: player.id,
-            error: result.error,
-          });
-        }
-      }
-    }
-  }
-
-  private isPlayerAwareModule(module: GameModule): module is GameModule & PlayerAwareModule {
-    return typeof (module as Partial<PlayerAwareModule>).onPlayerInitialSpawn === "function";
+  private onPlayerInitialSpawn(_player: Player): void {
+    // Reserved for feature-specific first-spawn actions.
   }
 }
 
-export interface PlayerAwareModule {
-  onPlayerInitialSpawn(player: Player): Result<void>;
+export interface PlayerAwareFeature {
+  onPlayerInitialSpawn(player: Player): SDResult<void>;
 }

@@ -1,3 +1,7 @@
+import { Player } from "@minecraft/server";
+import { ActionFormData, ActionFormResponse, MessageFormData, MessageFormResponse, ModalFormData, ModalFormResponse } from "@minecraft/server-ui";
+import { SDError, SDResult } from "./Common";
+
 
 export interface ActionFormButton<TValue = string> {
   readonly text: string;

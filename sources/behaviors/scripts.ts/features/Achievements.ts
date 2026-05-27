@@ -1,3 +1,7 @@
+import { Player, world } from "@minecraft/server";
+import { JsonStore, KeyBuilder, Logger, SDResult, SDError } from "../core";
+import { QuestEvent, QuestObjectiveHandlerRegistry, QuestRewardClaimStatus, QuestRewardDefinition, QuestTaskDefinition, QuestTaskProgress } from "./Quests";
+
 
 export const AchievementConstants = Object.freeze({
   version: 1,
